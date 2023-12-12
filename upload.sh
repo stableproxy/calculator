@@ -6,6 +6,9 @@ date=$(date +"%m-%d-%y %H:%M:%S")
 newVersion=$(echo $version | awk -F. -v OFS=. '{$NF++;print}')
 echo $newVersion > .version
 
+# replace package.json version
+npm version $newVersion --no-git-tag-version
+
 echo "Uploading calculator version $version/$date to GitHub & NPM..."
 # add all to git
 git add .
