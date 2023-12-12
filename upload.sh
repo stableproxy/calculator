@@ -8,7 +8,7 @@ git add .
 # commit with version number
 git commit -m "[#] Auto-Generate - $version, compiled at $date."
 # push to github
-git push origin master
+git push origin main
 # push to npm
 npm publish --access public
 echo "Done!"
