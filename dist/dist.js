@@ -139,25 +139,48 @@ var CurrencyRates = /** @class */ (function () {
     return CurrencyRates;
 }());
 exports.CurrencyRates = CurrencyRates;
+/**
+ * @class
+ */
 var PackageOrder = /** @class */ (function () {
+    /**
+     * @param {PackageOrder} [options={}]
+     */
     function PackageOrder(_a) {
         var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version;
+        /** @type {number | null} */
         this.id = id || null;
+        /** @type {number} */
         this.count = count || 0;
+        /** @type {number} */
         this.traffic_amount = traffic_amount || 0;
+        /** @type {string} */
         this.traffic_unit = traffic_unit || 'gb';
+        /** @type {number} */
         this.period_amount = period_amount || 0;
+        /** @type {string} */
         this.period_unit = period_unit || 'days';
-        this.countries = countries || [];
+        /** @type {Record<string, number>} */
+        this.countries = countries || {};
+        /** @type {string} */
         this.currency = currency || '';
+        /** @type {number} */
         this.added_price_per_day = added_price_per_day || 0;
+        /** @type {string} */
         this.type = type || '';
+        /** @type {boolean} */
         this.has_unlimited_auth_ips = has_unlimited_auth_ips || false;
+        /** @type {number} */
         this.user_id = user_id || 0;
+        /** @type {number} */
         this.already_spent_in_usd = already_spent_in_usd || 0;
+        /** @type {number} */
         this.version = version || -1;
     }
     Object.defineProperty(PackageOrder.prototype, "traffic_in_gb", {
+        /**
+         * @returns {number}
+         */
         get: function () {
             return CalcUtils.convertStorageUnit(this.traffic_amount, this.traffic_unit, 'gb');
         },
@@ -165,6 +188,9 @@ var PackageOrder = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(PackageOrder.prototype, "pay_for_setup", {
+        /**
+         * @returns {boolean}
+         */
         get: function () {
             return this.type && this.type.includes('gb');
         },
@@ -172,16 +198,29 @@ var PackageOrder = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(PackageOrder.prototype, "period_days", {
+        /**
+         * @returns {number}
+         */
         get: function () {
             return CalcUtils.convertTimeUnit(this.period_amount, this.period_unit, 'days');
         },
         enumerable: false,
         configurable: true
     });
+    /**
+     * @param {Calculator} calculator
+     * @param {string} currency
+     * @returns {CalculatorOutput}
+     */
     PackageOrder.prototype.getRenewPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
         return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
     };
+    /**
+     * @param {Calculator} calculator
+     * @param {string} currency
+     * @returns {CalculatorOutput}
+     */
     PackageOrder.prototype.getPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
         return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
@@ -216,6 +255,21 @@ var CalculatorInput = /** @class */ (function () {
     return CalculatorInput;
 }());
 exports.CalculatorInput = CalculatorInput;
+/**
+ * @property {number} overall
+ * @property {number} oneProxy
+ * @property {string} overallFormatted
+ * @property {string} oneProxyFormatted
+ * @property {number} overallUSD
+ * @property {number} oneProxyUSD
+ * @property {string} overallFormattedUSD
+ * @property {string} oneProxyFormattedUSD
+ * @property {number} version
+ * @property {string} currency
+ * @property {number} salePercentage
+ * @property {number} saleAmountUSD
+ * @property {number} saleAmount
+ */
 var CalculatorOutput = /** @class */ (function () {
     function CalculatorOutput(options) {
         this.overall = options.overall || null;
@@ -240,10 +294,10 @@ var Calculator = /** @class */ (function () {
             return -1;
         }; }
         if (salePercentageFetch === void 0) { salePercentageFetch = function () {
-            return null;
+            return 1;
         }; }
         if (localeFetch === void 0) { localeFetch = function () {
-            return null;
+            return 'en';
         }; }
         this.currencyRates = new CurrencyRates();
         this.lang = new Lang();
@@ -270,6 +324,7 @@ var Calculator = /** @class */ (function () {
     };
     /**
      * @param {CalculatorInput} options
+     * @returns {CalculatorOutput}
      */
     Calculator.prototype.calculate = function (options) {
         var currency = options.currency;

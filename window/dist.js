@@ -140,7 +140,14 @@
             return nf ?  nf.format(value) :  value +  " " +  currency;
         }
     }
+    /**
+ * @class
+ */
     class PackageOrder {
+
+        /**
+     * @param {PackageOrder} [options={}]
+     */
         constructor({
             id,
             count,
@@ -157,33 +164,80 @@
             already_spent_in_usd,
             version
         } =  {}) {
-            this.id =  id ||  null;
-            this.count =  count ||  0;
-            this.traffic_amount =  traffic_amount ||  0;
-            this.traffic_unit =  traffic_unit ||  'gb';
-            this.period_amount =  period_amount ||  0;
-            this.period_unit =  period_unit ||  'days';
-            this.countries =  countries ||  [];
-            this.currency =  currency ||  '';
-            this.added_price_per_day =  added_price_per_day ||  0;
-            this.type =  type ||  '';
-            this.has_unlimited_auth_ips =  has_unlimited_auth_ips ||  false;
-            this.user_id =  user_id ||  0;
-            this.already_spent_in_usd =  already_spent_in_usd ||  0;
-            this.version =  version ||  - 1;
+
+            /** @type {number | null} */
+             this.id =  id ||  null;
+
+            /** @type {number} */
+             this.count =  count ||  0;
+
+            /** @type {number} */
+             this.traffic_amount =  traffic_amount ||  0;
+
+            /** @type {string} */
+             this.traffic_unit =  traffic_unit ||  'gb';
+
+            /** @type {number} */
+             this.period_amount =  period_amount ||  0;
+
+            /** @type {string} */
+             this.period_unit =  period_unit ||  'days';
+
+            /** @type {Record<string, number>} */
+             this.countries =  countries ||  {};
+
+            /** @type {string} */
+             this.currency =  currency ||  '';
+
+            /** @type {number} */
+             this.added_price_per_day =  added_price_per_day ||  0;
+
+            /** @type {string} */
+             this.type =  type ||  '';
+
+            /** @type {boolean} */
+             this.has_unlimited_auth_ips =  has_unlimited_auth_ips ||  false;
+
+            /** @type {number} */
+             this.user_id =  user_id ||  0;
+
+            /** @type {number} */
+             this.already_spent_in_usd =  already_spent_in_usd ||  0;
+
+            /** @type {number} */
+             this.version =  version ||  - 1;
         }
+        /**
+	 * @returns {number}
+	 */
         get traffic_in_gb() {
             return CalcUtils.convertStorageUnit(this.traffic_amount,  this.traffic_unit,  'gb');
         }
+        /**
+	 * @returns {boolean}
+	 */
         get pay_for_setup() {
             return this.type &&  this.type.includes('gb');
         }
+        /**
+	 * @returns {number}
+	 */
         get period_days() {
             return CalcUtils.convertTimeUnit(this.period_amount,  this.period_unit,  'days');
         }
+        /**
+	 * @param {Calculator} calculator
+	 * @param {string} currency
+	 * @returns {CalculatorOutput}
+	 */
         getRenewPrices(calculator,  currency =  null) {
             return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
         }
+        /**
+	 * @param {Calculator} calculator
+	 * @param {string} currency
+	 * @returns {CalculatorOutput}
+	 */
         getPrices(calculator,  currency =  null) {
             return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
         }
@@ -203,6 +257,21 @@
             this.ownerId =  isObject ?  (currencyOrOptions[`ownerId`] ||  -  1) :  ownerId;
         }
     }
+    /**
+ * @property {number} overall
+ * @property {number} oneProxy
+ * @property {string} overallFormatted
+ * @property {string} oneProxyFormatted
+ * @property {number} overallUSD
+ * @property {number} oneProxyUSD
+ * @property {string} overallFormattedUSD
+ * @property {string} oneProxyFormattedUSD
+ * @property {number} version
+ * @property {string} currency
+ * @property {number} salePercentage
+ * @property {number} saleAmountUSD
+ * @property {number} saleAmount
+ */
     class CalculatorOutput {
         constructor(options) {
             this.overall =  options.overall ||  null;
@@ -228,12 +297,12 @@
         },
          salePercentageFetch =  function() {
 
-            return null;
+            return 1;
 
         },
          localeFetch =  function() {
 
-            return null;
+            return 'en';
 
         }) {
             this.currencyRates =  new CurrencyRates();
@@ -259,6 +328,7 @@
         }
         /**
 	 * @param {CalculatorInput} options
+	 * @returns {CalculatorOutput}
 	 */
         calculate(options) {
             let currency =  options.currency;

@@ -1,18 +1,19 @@
 export default Calculator;
 declare class Calculator {
-    constructor(userIdFetch?: () => number, salePercentageFetch?: () => any, localeFetch?: () => any);
+    constructor(userIdFetch?: () => number, salePercentageFetch?: () => number, localeFetch?: () => string);
     currencyRates: CurrencyRates;
     lang: Lang;
     userIdFetch: () => number;
-    salePercentageFetch: () => any;
-    localeFetch: () => any;
-    getLocale(): any;
-    phase(key: any, args?: any[], locale?: any): any;
-    getSalePercentage(): any;
+    salePercentageFetch: () => number;
+    localeFetch: () => string;
+    getLocale(): string;
+    phase(key: any, args?: any[], locale?: string): any;
+    getSalePercentage(): number;
     getUserId(): number;
     isLogged(): boolean;
     /**
      * @param {CalculatorInput} options
+     * @returns {CalculatorOutput}
      */
     calculate(options: CalculatorInput): CalculatorOutput;
 }
@@ -52,42 +53,66 @@ export class CalcUtils {
     static addMonthsDate(date: any, months: any): any;
     static convertTimeUnit(value: any, from: any, to: any): any;
 }
+/**
+ * @class
+ */
 export class PackageOrder {
-    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version }?: {
-        id: any;
-        count: any;
-        traffic_amount: any;
-        traffic_unit: any;
-        period_amount: any;
-        period_unit: any;
-        countries: any;
-        currency: any;
-        added_price_per_day: any;
-        type: any;
-        has_unlimited_auth_ips: any;
-        user_id: any;
-        already_spent_in_usd: any;
-        version: any;
-    });
-    id: any;
-    count: any;
-    traffic_amount: any;
-    traffic_unit: any;
-    period_amount: any;
-    period_unit: any;
-    countries: any;
-    currency: any;
-    added_price_per_day: any;
-    type: any;
-    has_unlimited_auth_ips: any;
-    user_id: any;
-    already_spent_in_usd: any;
-    version: any;
-    get traffic_in_gb(): any;
-    get pay_for_setup(): any;
-    get period_days(): any;
-    getRenewPrices(calculator: any, currency?: any): any;
-    getPrices(calculator: any, currency?: any): any;
+    /**
+     * @param {PackageOrder} [options={}]
+     */
+    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version }?: PackageOrder);
+    /** @type {number | null} */
+    id: number | null;
+    /** @type {number} */
+    count: number;
+    /** @type {number} */
+    traffic_amount: number;
+    /** @type {string} */
+    traffic_unit: string;
+    /** @type {number} */
+    period_amount: number;
+    /** @type {string} */
+    period_unit: string;
+    /** @type {Record<string, number>} */
+    countries: Record<string, number>;
+    /** @type {string} */
+    currency: string;
+    /** @type {number} */
+    added_price_per_day: number;
+    /** @type {string} */
+    type: string;
+    /** @type {boolean} */
+    has_unlimited_auth_ips: boolean;
+    /** @type {number} */
+    user_id: number;
+    /** @type {number} */
+    already_spent_in_usd: number;
+    /** @type {number} */
+    version: number;
+    /**
+     * @returns {number}
+     */
+    get traffic_in_gb(): number;
+    /**
+     * @returns {boolean}
+     */
+    get pay_for_setup(): boolean;
+    /**
+     * @returns {number}
+     */
+    get period_days(): number;
+    /**
+     * @param {Calculator} calculator
+     * @param {string} currency
+     * @returns {CalculatorOutput}
+     */
+    getRenewPrices(calculator: Calculator, currency?: string): CalculatorOutput;
+    /**
+     * @param {Calculator} calculator
+     * @param {string} currency
+     * @returns {CalculatorOutput}
+     */
+    getPrices(calculator: Calculator, currency?: string): CalculatorOutput;
 }
 declare class Lang {
     constructor(phases?: {
@@ -117,6 +142,21 @@ declare class Lang {
     locale: string;
     get(key: any, args?: any[], locale?: string): any;
 }
+/**
+ * @property {number} overall
+ * @property {number} oneProxy
+ * @property {string} overallFormatted
+ * @property {string} oneProxyFormatted
+ * @property {number} overallUSD
+ * @property {number} oneProxyUSD
+ * @property {string} overallFormattedUSD
+ * @property {string} oneProxyFormattedUSD
+ * @property {number} version
+ * @property {string} currency
+ * @property {number} salePercentage
+ * @property {number} saleAmountUSD
+ * @property {number} saleAmount
+ */
 declare class CalculatorOutput {
     constructor(options: any);
     overall: any;
