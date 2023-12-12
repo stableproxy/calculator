@@ -2,6 +2,10 @@
 version=$(cat .version)
 date=$(date +"%m-%d-%y %H:%M:%S")
 
+# add to version 0.0.X 1
+newVersion=$(echo $version | awk -F. -v OFS=. '{$NF++;print}')
+echo $newVersion > .version
+
 echo "Uploading calculator version $version/$date to GitHub & NPM..."
 # add all to git
 git add .
