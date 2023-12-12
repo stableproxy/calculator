@@ -1,6 +1,6 @@
 {
     "name": "@stableproxy/calculator",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "description": "Calculator module for the frontend",
     "main": "dist.js",
     "scripts": {

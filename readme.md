@@ -1,4 +1,4 @@
-# Calculator.js
+# Calculator.js [![npm version](https://img.shields.io/npm/v/@stableproxy/calculator.svg?style=flat)](https://www.npmjs.com/@stableproxy/calculator)
 
 ## ⚠️ This is auto-generated module. Do not modify it manually.
 
