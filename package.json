@@ -1,10 +1,20 @@
 {
     "name": "@stableproxy/calculator",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "description": "Calculator module for the frontend",
     "main": "dist.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "calculator",
+        "module",
+        "frontend",
+        "proxy"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/stableproxy/calculator.git"
     },
     "author": "StableProxy",
     "license": "ISC"
