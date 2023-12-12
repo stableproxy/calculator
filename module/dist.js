@@ -563,6 +563,9 @@ default Calculator;
          CurrencyRates
     };
     export {
+         CalculatorOutput
+    };
+    export {
          CalcUtils
     };
     export {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PackageOrder = exports.CalcUtils = exports.CurrencyRates = exports.CalculatorInput = void 0;
+exports.PackageOrder = exports.CalcUtils = exports.CalculatorOutput = exports.CurrencyRates = exports.CalculatorInput = void 0;
 var Lang = /** @class */ (function () {
     function Lang(phases, locale) {
         if (phases === void 0) { phases = {
@@ -288,6 +288,7 @@ var CalculatorOutput = /** @class */ (function () {
     }
     return CalculatorOutput;
 }());
+exports.CalculatorOutput = CalculatorOutput;
 var Calculator = /** @class */ (function () {
     function Calculator(userIdFetch, salePercentageFetch, localeFetch) {
         if (userIdFetch === void 0) { userIdFetch = function () {

@@ -558,6 +558,7 @@
     window.SP =  window.SP ||  {};
     window.SP.Calculator =  Calculator;
     window.SP.CalculatorInput =  CalculatorInput;
+    window.SP.CalculatorOutput =  CalculatorOutput;
     window.SP.CurrencyRates =  CurrencyRates;
     window.SP.CalcUtils =  CalcUtils;
     window.SP.PackageOrder =  PackageOrder;

@@ -46,6 +46,37 @@ export class CurrencyRates {
     get(currency: any): any;
     format(value: any, currency: any): string;
 }
+/**
+ * @property {number} overall
+ * @property {number} oneProxy
+ * @property {string} overallFormatted
+ * @property {string} oneProxyFormatted
+ * @property {number} overallUSD
+ * @property {number} oneProxyUSD
+ * @property {string} overallFormattedUSD
+ * @property {string} oneProxyFormattedUSD
+ * @property {number} version
+ * @property {string} currency
+ * @property {number} salePercentage
+ * @property {number} saleAmountUSD
+ * @property {number} saleAmount
+ */
+export class CalculatorOutput {
+    constructor(options: any);
+    overall: any;
+    oneProxy: any;
+    overallFormatted: any;
+    oneProxyFormatted: any;
+    overallUSD: any;
+    oneProxyUSD: any;
+    overallFormattedUSD: any;
+    oneProxyFormattedUSD: any;
+    version: any;
+    currency: any;
+    salePercentage: any;
+    saleAmountUSD: any;
+    saleAmount: any;
+}
 export class CalcUtils {
     static is_numeric(value: any): boolean;
     static round(num: any, dec?: number): number;
@@ -141,36 +172,5 @@ declare class Lang {
     };
     locale: string;
     get(key: any, args?: any[], locale?: string): any;
-}
-/**
- * @property {number} overall
- * @property {number} oneProxy
- * @property {string} overallFormatted
- * @property {string} oneProxyFormatted
- * @property {number} overallUSD
- * @property {number} oneProxyUSD
- * @property {string} overallFormattedUSD
- * @property {string} oneProxyFormattedUSD
- * @property {number} version
- * @property {string} currency
- * @property {number} salePercentage
- * @property {number} saleAmountUSD
- * @property {number} saleAmount
- */
-declare class CalculatorOutput {
-    constructor(options: any);
-    overall: any;
-    oneProxy: any;
-    overallFormatted: any;
-    oneProxyFormatted: any;
-    overallUSD: any;
-    oneProxyUSD: any;
-    overallFormattedUSD: any;
-    oneProxyFormattedUSD: any;
-    version: any;
-    currency: any;
-    salePercentage: any;
-    saleAmountUSD: any;
-    saleAmount: any;
 }
 //# sourceMappingURL=dist.d.ts.map

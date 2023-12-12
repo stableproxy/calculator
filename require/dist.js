@@ -557,6 +557,7 @@ class Calculator {
 module.exports =  {
     Calculator,
     CalculatorInput,
+    CalculatorOutput,
     CurrencyRates,
     CalcUtils,
     PackageOrder
