@@ -1,3 +1,5 @@
+npx -p typescript tsc -p .
+
 # save .version content to variable
 version=$(cat .version)
 date=$(date +"%m-%d-%y %H:%M:%S")

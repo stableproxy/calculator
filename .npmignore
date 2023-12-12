@@ -21,3 +21,5 @@ coverage
 .env
 *.log
 upload.sh
+
+node_modules
