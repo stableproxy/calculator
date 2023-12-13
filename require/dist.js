@@ -140,12 +140,30 @@ class CurrencyRates {
     }
 }
 /**
+ * @typedef {Object} PackageOrderConstructor
+ * @property {number | null} id
+ * @property {number} count
+ * @property {number} traffic_amount
+ * @property {string} traffic_unit
+ * @property {number} period_amount
+ * @property {string} period_unit
+ * @property {Record<string, number>} countries
+ * @property {string} currency
+ * @property {number} added_price_per_day
+ * @property {string} type
+ * @property {boolean} has_unlimited_auth_ips
+ * @property {number} user_id
+ * @property {number} already_spent_in_usd
+ * @property {number} version
+ */
+
+/**
  * @class
  */
 class PackageOrder {
 
     /**
-     * @param {PackageOrder} [options={}]
+     * @param {PackageOrderConstructor} [options={}]
      */
     constructor({
         id,
@@ -256,7 +274,7 @@ class CalculatorInput {
         this.ownerId =  isObject ?  (currencyOrOptions[`ownerId`] ||  -  1) :  ownerId;
     }
 }
-/**
+/*
  * @property {number} overall
  * @property {number} oneProxy
  * @property {string} overallFormatted
@@ -273,22 +291,55 @@ class CalculatorInput {
  */
 class CalculatorOutput {
     constructor(options) {
-        this.overall =  options.overall ||  null;
-        this.oneProxy =  options.oneProxy ||  null;
-        this.overallFormatted =  options.overallFormatted ||  null;
-        this.oneProxyFormatted =  options.oneProxyFormatted ||  null;
-        this.overallUSD =  options.overallUSD ||  null;
-        this.oneProxyUSD =  options.oneProxyUSD ||  null;
-        this.overallFormattedUSD =  options.overallFormattedUSD ||  null;
-        this.oneProxyFormattedUSD =  options.oneProxyFormattedUSD ||  null;
-        this.version =  options.version ||  null;
-        this.currency =  options.currency ||  null;
-        this.salePercentage =  options.salePercentage ||  null;
-        this.saleAmountUSD =  options.saleAmountUSD ||  null;
-        this.saleAmount =  options.saleAmount ||  null;
+        /** @type {number} */
+        this.overall =  options.overall ||  0;
+        /** @type {number} */
+        this.oneProxy =  options.oneProxy ||  0;
+        /** @type {string} */
+        this.overallFormatted =  options.overallFormatted ||  '';
+        /** @type {string} */
+        this.oneProxyFormatted =  options.oneProxyFormatted ||  '';
+        /** @type {number} */
+        this.overallUSD =  options.overallUSD ||  0;
+        /** @type {number} */
+        this.oneProxyUSD =  options.oneProxyUSD ||  0;
+        /** @type {string} */
+        this.overallFormattedUSD =  options.overallFormattedUSD ||  '';
+        /** @type {string} */
+        this.oneProxyFormattedUSD =  options.oneProxyFormattedUSD ||  '';
+        /** @type {number} */
+        this.version =  options.version ||  - 1;
+        /** @type {string} */
+        this.currency =  options.currency ||  'USD';
+        /** @type {number} */
+        this.salePercentage =  options.salePercentage ||  1;
+        /** @type {number} */
+        this.saleAmountUSD =  options.saleAmountUSD ||  0;
+        /** @type {number} */
+        this.saleAmount =  options.saleAmount ||  0;
     }
 }
 class Calculator {
+    /**
+	 * @callback userIdFetch
+	 * @returns {number}
+	 */
+
+    /*
+	 * @callback salePercentageFetch
+	 * @returns {number}
+	 */
+
+    /*
+	 * @callback localeFetch
+	 * @returns {string}
+	 */
+
+    /*
+	 * @param {userIdFetch} userIdFetch
+	 * @param {salePercentageFetch} salePercentageFetch
+	 * @param {localeFetch} localeFetch
+	 */
     constructor(userIdFetch =  function() {
 
         return - 1;

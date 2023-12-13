@@ -140,11 +140,28 @@ var CurrencyRates = /** @class */ (function () {
 }());
 exports.CurrencyRates = CurrencyRates;
 /**
+ * @typedef {Object} PackageOrderConstructor
+ * @property {number | null} id
+ * @property {number} count
+ * @property {number} traffic_amount
+ * @property {string} traffic_unit
+ * @property {number} period_amount
+ * @property {string} period_unit
+ * @property {Record<string, number>} countries
+ * @property {string} currency
+ * @property {number} added_price_per_day
+ * @property {string} type
+ * @property {boolean} has_unlimited_auth_ips
+ * @property {number} user_id
+ * @property {number} already_spent_in_usd
+ * @property {number} version
+ */
+/**
  * @class
  */
 var PackageOrder = /** @class */ (function () {
     /**
-     * @param {PackageOrder} [options={}]
+     * @param {PackageOrderConstructor} [options={}]
      */
     function PackageOrder(_a) {
         var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version;
@@ -255,7 +272,7 @@ var CalculatorInput = /** @class */ (function () {
     return CalculatorInput;
 }());
 exports.CalculatorInput = CalculatorInput;
-/**
+/*
  * @property {number} overall
  * @property {number} oneProxy
  * @property {string} overallFormatted
@@ -272,24 +289,54 @@ exports.CalculatorInput = CalculatorInput;
  */
 var CalculatorOutput = /** @class */ (function () {
     function CalculatorOutput(options) {
-        this.overall = options.overall || null;
-        this.oneProxy = options.oneProxy || null;
-        this.overallFormatted = options.overallFormatted || null;
-        this.oneProxyFormatted = options.oneProxyFormatted || null;
-        this.overallUSD = options.overallUSD || null;
-        this.oneProxyUSD = options.oneProxyUSD || null;
-        this.overallFormattedUSD = options.overallFormattedUSD || null;
-        this.oneProxyFormattedUSD = options.oneProxyFormattedUSD || null;
-        this.version = options.version || null;
-        this.currency = options.currency || null;
-        this.salePercentage = options.salePercentage || null;
-        this.saleAmountUSD = options.saleAmountUSD || null;
-        this.saleAmount = options.saleAmount || null;
+        /** @type {number} */
+        this.overall = options.overall || 0;
+        /** @type {number} */
+        this.oneProxy = options.oneProxy || 0;
+        /** @type {string} */
+        this.overallFormatted = options.overallFormatted || '';
+        /** @type {string} */
+        this.oneProxyFormatted = options.oneProxyFormatted || '';
+        /** @type {number} */
+        this.overallUSD = options.overallUSD || 0;
+        /** @type {number} */
+        this.oneProxyUSD = options.oneProxyUSD || 0;
+        /** @type {string} */
+        this.overallFormattedUSD = options.overallFormattedUSD || '';
+        /** @type {string} */
+        this.oneProxyFormattedUSD = options.oneProxyFormattedUSD || '';
+        /** @type {number} */
+        this.version = options.version || -1;
+        /** @type {string} */
+        this.currency = options.currency || 'USD';
+        /** @type {number} */
+        this.salePercentage = options.salePercentage || 1;
+        /** @type {number} */
+        this.saleAmountUSD = options.saleAmountUSD || 0;
+        /** @type {number} */
+        this.saleAmount = options.saleAmount || 0;
     }
     return CalculatorOutput;
 }());
 exports.CalculatorOutput = CalculatorOutput;
 var Calculator = /** @class */ (function () {
+    /**
+     * @callback userIdFetch
+     * @returns {number}
+     */
+    /*
+     * @callback salePercentageFetch
+     * @returns {number}
+     */
+    /*
+     * @callback localeFetch
+     * @returns {string}
+     */
+    /*
+     * @param {userIdFetch} userIdFetch
+     * @param {salePercentageFetch} salePercentageFetch
+     * @param {localeFetch} localeFetch
+     */
     function Calculator(userIdFetch, salePercentageFetch, localeFetch) {
         if (userIdFetch === void 0) { userIdFetch = function () {
             return -1;

@@ -1,5 +1,25 @@
 export default Calculator;
+export type PackageOrderConstructor = {
+    id: number | null;
+    count: number;
+    traffic_amount: number;
+    traffic_unit: string;
+    period_amount: number;
+    period_unit: string;
+    countries: Record<string, number>;
+    currency: string;
+    added_price_per_day: number;
+    type: string;
+    has_unlimited_auth_ips: boolean;
+    user_id: number;
+    already_spent_in_usd: number;
+    version: number;
+};
 declare class Calculator {
+    /**
+     * @callback userIdFetch
+     * @returns {number}
+     */
     constructor(userIdFetch?: () => number, salePercentageFetch?: () => number, localeFetch?: () => string);
     currencyRates: CurrencyRates;
     lang: Lang;
@@ -46,36 +66,34 @@ export class CurrencyRates {
     get(currency: any): any;
     format(value: any, currency: any): string;
 }
-/**
- * @property {number} overall
- * @property {number} oneProxy
- * @property {string} overallFormatted
- * @property {string} oneProxyFormatted
- * @property {number} overallUSD
- * @property {number} oneProxyUSD
- * @property {string} overallFormattedUSD
- * @property {string} oneProxyFormattedUSD
- * @property {number} version
- * @property {string} currency
- * @property {number} salePercentage
- * @property {number} saleAmountUSD
- * @property {number} saleAmount
- */
 export class CalculatorOutput {
     constructor(options: any);
-    overall: any;
-    oneProxy: any;
-    overallFormatted: any;
-    oneProxyFormatted: any;
-    overallUSD: any;
-    oneProxyUSD: any;
-    overallFormattedUSD: any;
-    oneProxyFormattedUSD: any;
-    version: any;
-    currency: any;
-    salePercentage: any;
-    saleAmountUSD: any;
-    saleAmount: any;
+    /** @type {number} */
+    overall: number;
+    /** @type {number} */
+    oneProxy: number;
+    /** @type {string} */
+    overallFormatted: string;
+    /** @type {string} */
+    oneProxyFormatted: string;
+    /** @type {number} */
+    overallUSD: number;
+    /** @type {number} */
+    oneProxyUSD: number;
+    /** @type {string} */
+    overallFormattedUSD: string;
+    /** @type {string} */
+    oneProxyFormattedUSD: string;
+    /** @type {number} */
+    version: number;
+    /** @type {string} */
+    currency: string;
+    /** @type {number} */
+    salePercentage: number;
+    /** @type {number} */
+    saleAmountUSD: number;
+    /** @type {number} */
+    saleAmount: number;
 }
 export class CalcUtils {
     static is_numeric(value: any): boolean;
@@ -85,13 +103,30 @@ export class CalcUtils {
     static convertTimeUnit(value: any, from: any, to: any): any;
 }
 /**
+ * @typedef {Object} PackageOrderConstructor
+ * @property {number | null} id
+ * @property {number} count
+ * @property {number} traffic_amount
+ * @property {string} traffic_unit
+ * @property {number} period_amount
+ * @property {string} period_unit
+ * @property {Record<string, number>} countries
+ * @property {string} currency
+ * @property {number} added_price_per_day
+ * @property {string} type
+ * @property {boolean} has_unlimited_auth_ips
+ * @property {number} user_id
+ * @property {number} already_spent_in_usd
+ * @property {number} version
+ */
+/**
  * @class
  */
 export class PackageOrder {
     /**
-     * @param {PackageOrder} [options={}]
+     * @param {PackageOrderConstructor} [options={}]
      */
-    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version }?: PackageOrder);
+    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version }?: PackageOrderConstructor);
     /** @type {number | null} */
     id: number | null;
     /** @type {number} */
