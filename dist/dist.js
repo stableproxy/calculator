@@ -7,11 +7,13 @@ var Lang = /** @class */ (function () {
             "messages.landing.calculator.one-gb-price": {
                 "uk": "\u0426\u0456\u043d\u0430 \u0437\u0430 GB",
                 "en": "Price per GB",
+                "pl": "Cena za GB",
                 "ru": "\u0426\u0435\u043d\u0430 \u0437\u0430 GB"
             },
             "messages.landing.calculator.oneproxyprice": {
                 "uk": "1 \u043f\u0440\u043e\u043a\u0441\u0456",
                 "en": "1 proxy",
+                "pl": "1 serwer proxy",
                 "ru": "1 \u043f\u0440\u043e\u043a\u0441\u0438"
             }
         }; }
@@ -386,6 +388,9 @@ var Calculator = /** @class */ (function () {
         var trafficInGb = options.trafficInGb;
         var ownerId = options.ownerId;
         var myId = this.isLogged() ? this.getUserId() : -1;
+        if (daysCount > 28 && daysCount < 32) {
+            daysCount = 29;
+        }
         if (version == -1) {
             version = 20;
         }
@@ -414,13 +419,13 @@ var Calculator = /** @class */ (function () {
         else if (isMobile) {
             if (String.prototype.endsWith.call(proxyFor, "modem") || String.prototype.endsWith.call(proxyFor, "static")) {
                 if (daysCount <= 3) {
-                    oneProxyPriceInUsd = 4;
+                    oneProxyPriceInUsd = 4.2;
                 }
                 else if (daysCount >= 3 && daysCount <= 18) {
-                    oneProxyPriceInUsd = 15;
+                    oneProxyPriceInUsd = 16.8;
                 }
                 else {
-                    oneProxyPriceInUsd = 40;
+                    oneProxyPriceInUsd = 25.2;
                 }
                 proxyAllPriceInUsd = oneProxyPriceInUsd * proxyCount;
                 if (daysCount > 35) {
@@ -428,7 +433,7 @@ var Calculator = /** @class */ (function () {
                 }
             }
             else {
-                oneProxyPriceInUsd = 1;
+                oneProxyPriceInUsd = 0.85;
                 ;
                 proxyAllPriceInUsd = oneProxyPriceInUsd * proxyCount;
             }
@@ -500,7 +505,7 @@ var Calculator = /** @class */ (function () {
                 proxyAllPriceInUsd += proxyAllPriceInUsd * 0.3;
             }
         }
-        if (!isRandomProxy) {
+        if (!isRandomProxy && !isResidential) {
             proxyAllPriceInUsd += 0.85;
         }
         if (version > 4 && !isRandomProxy) {
@@ -520,7 +525,7 @@ var Calculator = /** @class */ (function () {
                 proxyAllPriceInUsd += 1;
             }
             else {
-                proxyAllPriceInUsd += 4;
+                proxyAllPriceInUsd += 2;
             }
         }
         var usdRate = this.currencyRates.get('USD');
@@ -529,6 +534,12 @@ var Calculator = /** @class */ (function () {
         var oneProxyPriceUSD = CalcUtils.round((Math.abs(oneProxyPriceInUsd)) * usdRate, 2);
         var totalPrice = CalcUtils.round((Math.abs(totalPriceUSD)) * currencyRate, 2);
         var oneProxyPrice = CalcUtils.round((Math.abs(oneProxyPriceUSD)) * currencyRate, 2);
+        if (proxyFor == "free") {
+            oneProxyPriceUSD = 0;
+            totalPriceUSD = 0;
+            oneProxyPrice = 0;
+            totalPrice = 0;
+        }
         var total = this.currencyRates.format(totalPrice, currency);
         var additional = this.currencyRates.format(oneProxyPrice, currency);
         var totalUSD = this.currencyRates.format(totalPriceUSD, 'USD');

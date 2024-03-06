@@ -185,11 +185,13 @@ declare class Lang {
         "messages.landing.calculator.one-gb-price": {
             uk: string;
             en: string;
+            pl: string;
             ru: string;
         };
         "messages.landing.calculator.oneproxyprice": {
             uk: string;
             en: string;
+            pl: string;
             ru: string;
         };
     }, locale?: string);
@@ -197,11 +199,13 @@ declare class Lang {
         "messages.landing.calculator.one-gb-price": {
             uk: string;
             en: string;
+            pl: string;
             ru: string;
         };
         "messages.landing.calculator.oneproxyprice": {
             uk: string;
             en: string;
+            pl: string;
             ru: string;
         };
     };

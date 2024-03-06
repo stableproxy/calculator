@@ -3,11 +3,13 @@ class Lang {
         "messages.landing.calculator.one-gb-price": {
             "uk": "\u0426\u0456\u043d\u0430 \u0437\u0430 GB",
             "en": "Price per GB",
+            "pl": "Cena za GB",
             "ru": "\u0426\u0435\u043d\u0430 \u0437\u0430 GB"
         },
         "messages.landing.calculator.oneproxyprice": {
             "uk": "1 \u043f\u0440\u043e\u043a\u0441\u0456",
             "en": "1 proxy",
+            "pl": "1 serwer proxy",
             "ru": "1 \u043f\u0440\u043e\u043a\u0441\u0438"
         }
     },
@@ -393,6 +395,10 @@ class Calculator {
         let ownerId =  options.ownerId;
          let myId =  this.isLogged() ?  this.getUserId() :  -  1;
 
+        if (daysCount >  28 &&  daysCount <  32) {
+             daysCount =  29;
+
+        }
         if (version ==  -  1) {
              version =  20;
 
@@ -428,16 +434,16 @@ class Calculator {
             if (String.prototype.endsWith.call(proxyFor,  "modem") ||  String.prototype.endsWith.call(proxyFor,  "static")) {
 
                 if (daysCount <=  3) {
-                     oneProxyPriceInUsd =  4;
+                     oneProxyPriceInUsd =  4.2;
 
                 }
                 else
                 if (daysCount >=  3 &&  daysCount <=  18) {
-                     oneProxyPriceInUsd =  15;
+                     oneProxyPriceInUsd =  16.8;
 
                 }
                 else {
-                     oneProxyPriceInUsd =  40;
+                     oneProxyPriceInUsd =  25.2;
 
                 } proxyAllPriceInUsd =  oneProxyPriceInUsd *  proxyCount;
 
@@ -447,7 +453,7 @@ class Calculator {
                 }
             }
             else {
-                 oneProxyPriceInUsd =  1;;
+                 oneProxyPriceInUsd =  0.85;;
                  proxyAllPriceInUsd =  oneProxyPriceInUsd *  proxyCount;
 
             }
@@ -542,7 +548,7 @@ class Calculator {
 
             }
         }
-        if (!isRandomProxy) {
+        if (!isRandomProxy &&  !  isResidential) {
              proxyAllPriceInUsd +=  0.85;
 
         }
@@ -568,7 +574,7 @@ class Calculator {
 
             }
             else {
-                 proxyAllPriceInUsd +=  4;
+                 proxyAllPriceInUsd +=  2;
 
             }
         } let usdRate =  this.currencyRates.get('USD');
@@ -577,7 +583,14 @@ class Calculator {
          let oneProxyPriceUSD =  CalcUtils.round( (Math.abs(oneProxyPriceInUsd)) *  usdRate,  2);
          let totalPrice =  CalcUtils.round( (Math.abs(totalPriceUSD)) *  currencyRate,  2);
          let oneProxyPrice =  CalcUtils.round( (Math.abs(oneProxyPriceUSD)) *  currencyRate,  2);
-         let total =  this.currencyRates.format(totalPrice,  currency);
+
+        if (proxyFor ==  "free") {
+             oneProxyPriceUSD =  0;
+             totalPriceUSD =  0;
+             oneProxyPrice =  0;
+             totalPrice =  0;
+
+        } let total =  this.currencyRates.format(totalPrice,  currency);
          let additional =  this.currencyRates.format(oneProxyPrice,  currency);
          let totalUSD =  this.currencyRates.format(totalPriceUSD,  'USD');
          let additionalUSD =  this.currencyRates.format(oneProxyPriceUSD,  'USD');
