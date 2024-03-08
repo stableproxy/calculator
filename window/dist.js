@@ -549,13 +549,16 @@
 
                 }
             }
-            if (!isRandomProxy &&  !  isResidential) {
-                 proxyAllPriceInUsd +=  0.85;
+            if (!isResidential &&  !  isMobile) {
 
-            }
-            if (version >  4 &&  !  isRandomProxy) {
-                 proxyAllPriceInUsd +=  0.15;
+                if (!isRandomProxy) {
+                     proxyAllPriceInUsd +=  0.85;
 
+                }
+                if (version >  4 &&  !  isRandomProxy) {
+                     proxyAllPriceInUsd +=  0.15;
+
+                }
             } let proxyAllPriceInUsdWithSale =  proxyAllPriceInUsd /  salePercentage;
              let saleAmountInUSD =  proxyAllPriceInUsd -  proxyAllPriceInUsdWithSale;
              proxyAllPriceInUsd =  proxyAllPriceInUsdWithSale;

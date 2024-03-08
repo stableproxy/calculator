@@ -505,11 +505,13 @@ var Calculator = /** @class */ (function () {
                 proxyAllPriceInUsd += proxyAllPriceInUsd * 0.3;
             }
         }
-        if (!isRandomProxy && !isResidential) {
-            proxyAllPriceInUsd += 0.85;
-        }
-        if (version > 4 && !isRandomProxy) {
-            proxyAllPriceInUsd += 0.15;
+        if (!isResidential && !isMobile) {
+            if (!isRandomProxy) {
+                proxyAllPriceInUsd += 0.85;
+            }
+            if (version > 4 && !isRandomProxy) {
+                proxyAllPriceInUsd += 0.15;
+            }
         }
         var proxyAllPriceInUsdWithSale = proxyAllPriceInUsd / salePercentage;
         var saleAmountInUSD = proxyAllPriceInUsd - proxyAllPriceInUsdWithSale;
