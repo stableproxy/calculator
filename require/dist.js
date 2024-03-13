@@ -414,15 +414,19 @@ class Calculator {
          let isPayAsGo =  String.prototype.startsWith.call(proxyFor,  "payasgo");
          let isMobile =  String.prototype.startsWith.call(proxyFor,  "mobile");
          let isResidential =  String.prototype.startsWith.call(proxyFor,  "residential");
-         let oneProxyPriceInUsd =  ( (0.03 *  3) /  29) *  daysCount;
+
+        if (isResidential ||  isMobile) {
+             salePercentage =  1;
+
+        } let oneProxyPriceInUsd =  ( (0.03 *  3) /  29) *  daysCount;
          let proxyAllPriceInUsd =  1;
 
         if (isResidential) {
              let gbPrices =  {
-                 "1":  1.5,
-                 "5":  1.45,
-                 "25":  1.4,
-                 "50":  1.27
+                 "1":  1.65,
+                 "5":  1.6,
+                 "25":  1.55,
+                 "50":  1.5
             };
              oneProxyPriceInUsd =  gbPrices[trafficInGb] ||  100;
              proxyAllPriceInUsd =  oneProxyPriceInUsd *  trafficInGb;
@@ -453,7 +457,7 @@ class Calculator {
                 }
             }
             else {
-                 oneProxyPriceInUsd =  0.85;;
+                 oneProxyPriceInUsd =  0.85;
                  proxyAllPriceInUsd =  oneProxyPriceInUsd *  proxyCount;
 
             }
@@ -507,7 +511,7 @@ class Calculator {
 
             }
             if (daysCount >  350) {
-                 oneProxyPriceInUsd =  oneProxyPriceInUsd *  0.85;
+                 oneProxyPriceInUsd =  oneProxyPriceInUsd *  0.90;
 
             } proxyAllPriceInUsd =  proxyCount *  oneProxyPriceInUsd;
 

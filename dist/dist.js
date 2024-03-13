@@ -404,14 +404,17 @@ var Calculator = /** @class */ (function () {
         var isPayAsGo = String.prototype.startsWith.call(proxyFor, "payasgo");
         var isMobile = String.prototype.startsWith.call(proxyFor, "mobile");
         var isResidential = String.prototype.startsWith.call(proxyFor, "residential");
+        if (isResidential || isMobile) {
+            salePercentage = 1;
+        }
         var oneProxyPriceInUsd = ((0.03 * 3) / 29) * daysCount;
         var proxyAllPriceInUsd = 1;
         if (isResidential) {
             var gbPrices = {
-                "1": 1.5,
-                "5": 1.45,
-                "25": 1.4,
-                "50": 1.27
+                "1": 1.65,
+                "5": 1.6,
+                "25": 1.55,
+                "50": 1.5
             };
             oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
@@ -434,7 +437,6 @@ var Calculator = /** @class */ (function () {
             }
             else {
                 oneProxyPriceInUsd = 0.85;
-                ;
                 proxyAllPriceInUsd = oneProxyPriceInUsd * proxyCount;
             }
         }
@@ -474,7 +476,7 @@ var Calculator = /** @class */ (function () {
                 oneProxyPriceInUsd = oneProxyPriceInUsd * 1.2;
             }
             if (daysCount > 350) {
-                oneProxyPriceInUsd = oneProxyPriceInUsd * 0.85;
+                oneProxyPriceInUsd = oneProxyPriceInUsd * 0.90;
             }
             proxyAllPriceInUsd = proxyCount * oneProxyPriceInUsd;
             if (version > 1 && (trafficInGb > 90 || trafficInGb <= 0) && proxyCount < 100) {
