@@ -401,7 +401,7 @@
 
             }
             if (version ==  -  1) {
-                 version =  20;
+                 version =  30;
 
             }
             if (ownerId ==  -  1) {
@@ -471,89 +471,247 @@
             }
             else {
 
-                if (proxyFor ==  "private") {
-                     oneProxyPriceInUsd =  (1 /  29) *  daysCount;
+                if (version >=  30) {
+                     let priceTraffic =  0;
+                     oneProxyPriceInUsd =  0;
+                     let addService =  0;
+                     let discount =  0;
+
+                    /* ----- Count ----- */
+
+                    if (proxyFor ==  "private") {
+                         oneProxyPriceInUsd =  0.9;
+
+                    }
+                    else
+                    if (proxyFor ==  "shared") {
+                         oneProxyPriceInUsd =  0.08;
+
+                    }
+                    /* ----- Count ----- */
+
+                    /* ----- Traffic ----- */
+
+                    if (trafficInGb >  50 &&  trafficInGb <  150) {
+                         priceTraffic =  1;
+
+                    }
+                    else
+                    if (trafficInGb >  150 &&  trafficInGb <  250) {
+                         priceTraffic =  2;
+
+                    }
+                    else
+                    if (trafficInGb >  250 &&  trafficInGb <  350) {
+                         priceTraffic =  3;
+
+                    }
+                    else
+                    if (trafficInGb >  350 &&  trafficInGb <  500) {
+                         priceTraffic =  4;
+
+                    }
+                    else
+                    if (trafficInGb >  500) {
+                         priceTraffic =  8;
+
+                    }
+                    else
+                    if (trafficInGb ==  0) {
+                         priceTraffic =  50;
+
+                    }
+                    /* ----- Traffic ----- */
+
+                    /* ----- Adds ----- */
+
+                    if (!isRandomProxy) {
+                         addService +=  1;
+
+                    }
+                    /* ----- Adds ----- */
+
+                    /* ----- Count discount ----- */
+
+                    if (proxyFor ==  'shared') {
+
+                        if (proxyCount <  50) {
+                             discount =  1.2;
+
+                        }
+                        else
+                        if (proxyCount <  100) {
+                             discount =  1.1;
+
+                        }
+                        else
+                        if (proxyCount <  200) {
+                             discount =  1;
+
+                        }
+                        else
+                        if (proxyCount <  500) {
+                             discount =  0.97;
+
+                        }
+                        else
+                        if (proxyCount <  1000) {
+                             discount =  0.95;
+
+                        }
+                        else
+                        if (proxyCount <  10000) {
+                             discount =  0.9;
+
+                        }
+                    }
+                    else
+                    if (proxyFor ==  'private') {
+
+                        if (proxyCount <  50) {
+                             discount =  1;
+
+                        }
+                        else
+                        if (proxyCount <  100) {
+                             discount =  0.97;
+
+                        }
+                        else
+                        if (proxyCount <  200) {
+                             discount =  0.95;
+
+                        }
+                        else
+                        if (proxyCount <  500) {
+                             discount =  0.9;
+
+                        }
+                        else
+                        if (proxyCount <  1000) {
+                             discount =  0.9;
+
+                        }
+                        else
+                        if (proxyCount <  10000) {
+                             discount =  0.9;
+
+                        }
+                    }
+                    /* ----- Count discount ----- */
+                     proxyAllPriceInUsd =  (proxyCount *  oneProxyPriceInUsd) *  discount;
+
+                    /* ----- Day pricing ----- */
+
+                    if (daysCount >  33) {
+                         proxyAllPriceInUsd =  proxyAllPriceInUsd *  11;
+
+                    }
+                    else
+                    if (daysCount >  22) {
+                         proxyAllPriceInUsd =  proxyAllPriceInUsd *  1;
+
+                    }
+                    else
+                    if (daysCount >  11) {
+                         proxyAllPriceInUsd =  (proxyAllPriceInUsd /  2) *  1.2;
+
+                    }
+                    else
+                    if (daysCount >  1) {
+                         proxyAllPriceInUsd =  (proxyAllPriceInUsd /  4) *  1.4;
+
+                    }
+                    /* ----- Day pricing ----- */
+                     proxyAllPriceInUsd =  proxyAllPriceInUsd +  priceTraffic +  addService;
 
                 }
-                if (version >  1 &&  proxyFor !=  "private" &&  proxyCount <  100) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd *  (Math.max(1,  (Math.max(1,  50 -  proxyCount) /  20)));
+                else {
 
-                }
-                if (daysCount <  20) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd +  ( ( (10 -  daysCount) /  1000) /  40);
+                    if (proxyFor ==  "private") {
+                         oneProxyPriceInUsd =  (1 /  29) *  daysCount;
 
-                }
-                if (proxyCount <=  50 &&  daysCount <=  20) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd *  (Math.max(1,  (Math.max(1,  70 -  proxyCount) /  25)));
+                    }
+                    if (version >  1 &&  proxyFor !=  "private" &&  proxyCount <  100) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd *  (Math.max(1,  (Math.max(1,  50 -  proxyCount) /  20)));
 
-                }
-                if (proxyCount >=  200 &&  daysCount <=  20) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd /  (Math.min( (daysCount >  8 ?  1.1 :  1.3),  Math.max(1,  Math.max(1,  proxyCount -  199) /  25)));
+                    }
+                    if (daysCount <  20) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd +  ( ( (10 -  daysCount) /  1000) /  40);
 
-                }
-                if (daysCount <=  10) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd *  1.5;
+                    }
+                    if (proxyCount <=  50 &&  daysCount <=  20) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd *  (Math.max(1,  (Math.max(1,  70 -  proxyCount) /  25)));
 
-                }
-                if (daysCount <=  16) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd /  1.35;
+                    }
+                    if (proxyCount >=  200 &&  daysCount <=  20) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd /  (Math.min( (daysCount >  8 ?  1.1 :  1.3),  Math.max(1,  Math.max(1,  proxyCount -  199) /  25)));
 
-                }
-                if (daysCount <=  10 &&  proxyCount >  70) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd *  1.4;
+                    }
+                    if (daysCount <=  10) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd *  1.5;
 
-                }
-                if (daysCount <=  16 &&  proxyCount >  70) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd *  2.3;
+                    }
+                    if (daysCount <=  16) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd /  1.35;
 
-                }
-                if (daysCount >=  10 &&  daysCount <=  20) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd *  1.2;
+                    }
+                    if (daysCount <=  10 &&  proxyCount >  70) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd *  1.4;
 
-                }
-                if (daysCount >  350) {
-                     oneProxyPriceInUsd =  oneProxyPriceInUsd *  0.90;
+                    }
+                    if (daysCount <=  16 &&  proxyCount >  70) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd *  2.3;
 
-                } proxyAllPriceInUsd =  proxyCount *  oneProxyPriceInUsd;
+                    }
+                    if (daysCount >=  10 &&  daysCount <=  20) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd *  1.2;
 
-                if (version >  1 &&  (trafficInGb >  90 ||  trafficInGb <=  0) &&  proxyCount <  100) {
-                     proxyAllPriceInUsd +=  1 *  Math.max(daysCount /  29,  1);
+                    }
+                    if (daysCount >  350) {
+                         oneProxyPriceInUsd =  oneProxyPriceInUsd *  0.90;
 
-                }
-                if (version >  1 &&  (trafficInGb >  190 ||  trafficInGb <=  0)) {
-                     proxyAllPriceInUsd +=  1.2 *  Math.max(daysCount /  29,  1);
+                    } proxyAllPriceInUsd =  proxyCount *  oneProxyPriceInUsd;
 
-                }
-                if (version >  1 &&  (trafficInGb >  390 ||  trafficInGb <=  0)) {
-                     proxyAllPriceInUsd +=  1.5 *  Math.max(daysCount /  29,  1);
+                    if (version >  1 &&  (trafficInGb >  90 ||  trafficInGb <=  0) &&  proxyCount <  100) {
+                         proxyAllPriceInUsd +=  1 *  Math.max(daysCount /  29,  1);
 
-                }
-                if (version >  1 &&  (trafficInGb >  700 ||  trafficInGb <=  0)) {
-                     proxyAllPriceInUsd +=  4 *  Math.max(daysCount /  29,  1);
+                    }
+                    if (version >  1 &&  (trafficInGb >  190 ||  trafficInGb <=  0)) {
+                         proxyAllPriceInUsd +=  1.2 *  Math.max(daysCount /  29,  1);
 
-                }
-                if (version >  1 &&  trafficInGb <=  0) {
-                     proxyAllPriceInUsd +=  30 *  Math.max(daysCount /  29,  1);
+                    }
+                    if (version >  1 &&  (trafficInGb >  390 ||  trafficInGb <=  0)) {
+                         proxyAllPriceInUsd +=  1.5 *  Math.max(daysCount /  29,  1);
 
-                }
-                if (version >  5 &&  trafficInGb <=  0) {
-                     proxyAllPriceInUsd +=  Math.max(10,  ( (proxyCount /  100) *  1.2)) *  Math.max(daysCount /  29,  1);
+                    }
+                    if (version >  1 &&  (trafficInGb >  700 ||  trafficInGb <=  0)) {
+                         proxyAllPriceInUsd +=  4 *  Math.max(daysCount /  29,  1);
 
-                }
-                if (version >  5 &&  trafficInGb >=  400) {
-                     proxyAllPriceInUsd +=  (Math.max(1,  ( (proxyCount /  100) *  1.2)) *  Math.max(daysCount /  29,  1) /  1.1);
+                    }
+                    if (version >  1 &&  trafficInGb <=  0) {
+                         proxyAllPriceInUsd +=  30 *  Math.max(daysCount /  29,  1);
 
-                }
-                if (version >  5 &&  trafficInGb >=  800) {
-                     proxyAllPriceInUsd +=  (Math.max(1,  ( (proxyCount /  100) *  1.2)) *  Math.max(daysCount /  29,  1) /  1.2);
+                    }
+                    if (version >  5 &&  trafficInGb <=  0) {
+                         proxyAllPriceInUsd +=  Math.max(10,  ( (proxyCount /  100) *  1.2)) *  Math.max(daysCount /  29,  1);
 
-                }
-                if (version >  15 &&  trafficInGb <=  0) {
-                     proxyAllPriceInUsd +=  proxyAllPriceInUsd *  0.3;
+                    }
+                    if (version >  5 &&  trafficInGb >=  400) {
+                         proxyAllPriceInUsd +=  (Math.max(1,  ( (proxyCount /  100) *  1.2)) *  Math.max(daysCount /  29,  1) /  1.1);
 
+                    }
+                    if (version >  5 &&  trafficInGb >=  800) {
+                         proxyAllPriceInUsd +=  (Math.max(1,  ( (proxyCount /  100) *  1.2)) *  Math.max(daysCount /  29,  1) /  1.2);
+
+                    }
+                    if (version >  15 &&  trafficInGb <=  0) {
+                         proxyAllPriceInUsd +=  proxyAllPriceInUsd *  0.3;
+
+                    }
                 }
             }
-            if (!isResidential &&  !  isMobile) {
+            if (!isResidential &&  !  isMobile &&  version <=  20) {
 
                 if (!isRandomProxy) {
                      proxyAllPriceInUsd +=  0.85;
