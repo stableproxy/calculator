@@ -157,6 +157,8 @@ exports.CurrencyRates = CurrencyRates;
  * @property {number} user_id
  * @property {number} already_spent_in_usd
  * @property {number} version
+ * @property {number} isRenew
+ * @property {number} ipScore
  */
 /**
  * @class
@@ -166,7 +168,7 @@ var PackageOrder = /** @class */ (function () {
      * @param {PackageOrderConstructor} [options={}]
      */
     function PackageOrder(_a) {
-        var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version;
+        var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version, isRenew = _b.isRenew, ipScore = _b.ipScore;
         /** @type {number | null} */
         this.id = id || null;
         /** @type {number} */
@@ -195,6 +197,10 @@ var PackageOrder = /** @class */ (function () {
         this.already_spent_in_usd = already_spent_in_usd || 0;
         /** @type {number} */
         this.version = version || -1;
+        /** @type {number} */
+        this.isRenew = isRenew || 0;
+        /** @type {number} */
+        this.ipScore = ipScore || 0;
     }
     Object.defineProperty(PackageOrder.prototype, "traffic_in_gb", {
         /**
@@ -233,7 +239,7 @@ var PackageOrder = /** @class */ (function () {
      */
     PackageOrder.prototype.getRenewPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore));
     };
     /**
      * @param {Calculator} calculator
@@ -242,13 +248,13 @@ var PackageOrder = /** @class */ (function () {
      */
     PackageOrder.prototype.getPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore));
     };
     return PackageOrder;
 }());
 exports.PackageOrder = PackageOrder;
 var CalculatorInput = /** @class */ (function () {
-    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId) {
+    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, let, proxyFor, let, hasUnlimitedIps, let, version, let, trafficInGb, let, ownerId, let, isRenew, let, ipScore) {
         if (currencyOrOptions === void 0) { currencyOrOptions = "USD"; }
         if (proxyCount === void 0) { proxyCount = 100; }
         if (daysCount === void 0) { daysCount = 29; }
@@ -259,17 +265,35 @@ var CalculatorInput = /** @class */ (function () {
         if (version === void 0) { version = -1; }
         if (trafficInGb === void 0) { trafficInGb = 25; }
         if (ownerId === void 0) { ownerId = -1; }
+        if (isRenew === void 0) { isRenew = 0; }
+        if (ipScore === void 0) { ipScore = 0; }
         var isObject = currencyOrOptions !== null && typeof currencyOrOptions === 'object' && currencyOrOptions.constructor === Object;
         this.currency = isObject ? (currencyOrOptions["currency"] || "USD") : currencyOrOptions;
         this.proxyCount = isObject ? (currencyOrOptions["proxyCount"] || 100) : proxyCount;
         this.daysCount = isObject ? (currencyOrOptions["daysCount"] || 29) : daysCount;
         this.isRandomProxy = isObject ? (currencyOrOptions["isRandomProxy"] || true) : isRandomProxy;
         this.addedUSDToPerDay = isObject ? (currencyOrOptions["addedUSDToPerDay"] || 0) : addedUSDToPerDay;
-        this.proxyFor = isObject ? (currencyOrOptions["proxyFor"] || "shared") : proxyFor;
-        this.hasUnlimitedIps = isObject ? (currencyOrOptions["hasUnlimitedIps"] || false) : hasUnlimitedIps;
-        this.version = isObject ? (currencyOrOptions["version"] || -1) : version;
-        this.trafficInGb = isObject ? (currencyOrOptions["trafficInGb"] || 25) : trafficInGb;
-        this.ownerId = isObject ? (currencyOrOptions["ownerId"] || -1) : ownerId;
+        this.let;
+        proxyFor = isObject ? (currencyOrOptions["let proxyFor"] || "shared") : let;
+        proxyFor;
+        this.let;
+        hasUnlimitedIps = isObject ? (currencyOrOptions["let hasUnlimitedIps"] || false) : let;
+        hasUnlimitedIps;
+        this.let;
+        version = isObject ? (currencyOrOptions["let version"] || -1) : let;
+        version;
+        this.let;
+        trafficInGb = isObject ? (currencyOrOptions["let trafficInGb"] || 25) : let;
+        trafficInGb;
+        this.let;
+        ownerId = isObject ? (currencyOrOptions["let ownerId"] || -1) : let;
+        ownerId;
+        this.let;
+        isRenew = isObject ? (currencyOrOptions["let isRenew"] || 0) : let;
+        isRenew;
+        this.let;
+        ipScore = isObject ? (currencyOrOptions["let ipScore"] || 0) : let;
+        ipScore;
     }
     return CalculatorInput;
 }());
@@ -382,11 +406,13 @@ var Calculator = /** @class */ (function () {
         var daysCount = options.daysCount;
         var isRandomProxy = options.isRandomProxy;
         var addedUSDToPerDay = options.addedUSDToPerDay;
-        var proxyFor = options.proxyFor;
-        var hasUnlimitedIps = options.hasUnlimitedIps;
-        var version = options.version;
-        var trafficInGb = options.trafficInGb;
-        var ownerId = options.ownerId;
+        var let, proxyFor = options.let, proxyFor;
+        var let, hasUnlimitedIps = options.let, hasUnlimitedIps;
+        var let, version = options.let, version;
+        var let, trafficInGb = options.let, trafficInGb;
+        var let, ownerId = options.let, ownerId;
+        var let, isRenew = options.let, isRenew;
+        var let, ipScore = options.let, ipScore;
         var myId = this.isLogged() ? this.getUserId() : -1;
         if (daysCount > 28 && daysCount < 32) {
             daysCount = 29;
@@ -412,10 +438,11 @@ var Calculator = /** @class */ (function () {
         if (proxyFor == "residential_static_gb") {
             var oneIpPrice = 3;
             var oneGbPrice = 3;
+            var ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
             oneProxyPriceInUsd = 3;
-            proxyAllPriceInUsd = oneIpPrice + oneGbPrice * trafficInGb;
+            proxyAllPriceInUsd = ipsPrice + (oneGbPrice * trafficInGb);
         }
-        if (isResidential) {
+        else if (isResidential) {
             var gbPrices = {
                 "1": 1.65,
                 "5": 1.6,

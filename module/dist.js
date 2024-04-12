@@ -157,6 +157,8 @@ class CurrencyRates {
  * @property {number} user_id
  * @property {number} already_spent_in_usd
  * @property {number} version
+ * @property {number} isRenew
+ * @property {number} ipScore
  */
 
 /**
@@ -181,7 +183,9 @@ class PackageOrder {
         has_unlimited_auth_ips,
         user_id,
         already_spent_in_usd,
-        version
+        version,
+        isRenew,
+        ipScore
     } =  {}) {
 
         /** @type {number | null} */
@@ -225,6 +229,12 @@ class PackageOrder {
 
         /** @type {number} */
          this.version =  version ||  - 1;
+
+        /** @type {number} */
+         this.isRenew =  isRenew ||  0;
+
+        /** @type {number} */
+         this.ipScore =  ipScore ||  0;
     }
     /**
 	 * @returns {number}
@@ -250,7 +260,7 @@ class PackageOrder {
 	 * @returns {CalculatorOutput}
 	 */
     getRenewPrices(calculator,  currency =  null) {
-        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
+        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore));
     }
     /**
 	 * @param {Calculator} calculator
@@ -258,22 +268,24 @@ class PackageOrder {
 	 * @returns {CalculatorOutput}
 	 */
     getPrices(calculator,  currency =  null) {
-        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id));
+        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore));
     }
 }
 class CalculatorInput {
-    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1) {
+    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  let proxyFor =  "shared",  let hasUnlimitedIps =  false,  let version =  - 1,  let trafficInGb =  25,  let ownerId =  - 1,  let isRenew =  0,  let ipScore =  0) {
         const isObject =  currencyOrOptions !==  null &&  typeof currencyOrOptions ===  'object' &&  currencyOrOptions.constructor ===  Object;
         this.currency =  isObject ?  (currencyOrOptions[`currency`] ||  "USD") :  currencyOrOptions;
         this.proxyCount =  isObject ?  (currencyOrOptions[`proxyCount`] ||  100) :  proxyCount;
         this.daysCount =  isObject ?  (currencyOrOptions[`daysCount`] ||  29) :  daysCount;
         this.isRandomProxy =  isObject ?  (currencyOrOptions[`isRandomProxy`] ||  true) :  isRandomProxy;
         this.addedUSDToPerDay =  isObject ?  (currencyOrOptions[`addedUSDToPerDay`] ||  0) :  addedUSDToPerDay;
-        this.proxyFor =  isObject ?  (currencyOrOptions[`proxyFor`] ||  "shared") :  proxyFor;
-        this.hasUnlimitedIps =  isObject ?  (currencyOrOptions[`hasUnlimitedIps`] ||  false) :  hasUnlimitedIps;
-        this.version =  isObject ?  (currencyOrOptions[`version`] ||  -  1) :  version;
-        this.trafficInGb =  isObject ?  (currencyOrOptions[`trafficInGb`] ||  25) :  trafficInGb;
-        this.ownerId =  isObject ?  (currencyOrOptions[`ownerId`] ||  -  1) :  ownerId;
+        this.let proxyFor =  isObject ?  (currencyOrOptions[`let proxyFor`] ||  "shared") :  let proxyFor;
+        this.let hasUnlimitedIps =  isObject ?  (currencyOrOptions[`let hasUnlimitedIps`] ||  false) :  let hasUnlimitedIps;
+        this.let version =  isObject ?  (currencyOrOptions[`let version`] ||  -  1) :  let version;
+        this.let trafficInGb =  isObject ?  (currencyOrOptions[`let trafficInGb`] ||  25) :  let trafficInGb;
+        this.let ownerId =  isObject ?  (currencyOrOptions[`let ownerId`] ||  -  1) :  let ownerId;
+        this.let isRenew =  isObject ?  (currencyOrOptions[`let isRenew`] ||  0) :  let isRenew;
+        this.let ipScore =  isObject ?  (currencyOrOptions[`let ipScore`] ||  0) :  let ipScore;
     }
 }
 /*
@@ -388,11 +400,13 @@ class Calculator {
         let daysCount =  options.daysCount;
         let isRandomProxy =  options.isRandomProxy;
         let addedUSDToPerDay =  options.addedUSDToPerDay;
-        let proxyFor =  options.proxyFor;
-        let hasUnlimitedIps =  options.hasUnlimitedIps;
-        let version =  options.version;
-        let trafficInGb =  options.trafficInGb;
-        let ownerId =  options.ownerId;
+        let let proxyFor =  options.let proxyFor;
+        let let hasUnlimitedIps =  options.let hasUnlimitedIps;
+        let let version =  options.let version;
+        let let trafficInGb =  options.let trafficInGb;
+        let let ownerId =  options.let ownerId;
+        let let isRenew =  options.let isRenew;
+        let let ipScore =  options.let ipScore;
          let myId =  this.isLogged() ?  this.getUserId() :  -  1;
 
         if (daysCount >  28 &&  daysCount <  32) {
@@ -424,10 +438,12 @@ class Calculator {
         if (proxyFor ==  "residential_static_gb") {
              let oneIpPrice =  3;
              let oneGbPrice =  3;
+             let ipsPrice =  isRenew >  1 ?  0 :  (proxyCount *  oneIpPrice);
              oneProxyPriceInUsd =  3;
-             proxyAllPriceInUsd =  oneIpPrice +  oneGbPrice *  trafficInGb;
+             proxyAllPriceInUsd =  ipsPrice +  (oneGbPrice *  trafficInGb);
 
         }
+        else
         if (isResidential) {
              let gbPrices =  {
                  "1":  1.65,

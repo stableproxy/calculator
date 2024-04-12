@@ -14,6 +14,8 @@ export type PackageOrderConstructor = {
     user_id: number;
     already_spent_in_usd: number;
     version: number;
+    isRenew: number;
+    ipScore: number;
 };
 declare class Calculator {
     /**
@@ -38,17 +40,12 @@ declare class Calculator {
     calculate(options: CalculatorInput): CalculatorOutput;
 }
 export class CalculatorInput {
-    constructor(currencyOrOptions?: string, proxyCount?: number, daysCount?: number, isRandomProxy?: boolean, addedUSDToPerDay?: number, proxyFor?: string, hasUnlimitedIps?: boolean, version?: number, trafficInGb?: number, ownerId?: number);
+    constructor(currencyOrOptions: string, proxyCount: number, daysCount: number, isRandomProxy: boolean, addedUSDToPerDay: number, let: any, proxyFor: string, let: any, hasUnlimitedIps: boolean, let: any, version: number, let: any, trafficInGb: number, let: any, ownerId: number, let: any, isRenew: number, let: any, ipScore?: number);
     currency: any;
     proxyCount: any;
     daysCount: any;
     isRandomProxy: any;
     addedUSDToPerDay: any;
-    proxyFor: any;
-    hasUnlimitedIps: any;
-    version: any;
-    trafficInGb: any;
-    ownerId: any;
 }
 export class CurrencyRates {
     constructor(rates?: {
@@ -118,6 +115,8 @@ export class CalcUtils {
  * @property {number} user_id
  * @property {number} already_spent_in_usd
  * @property {number} version
+ * @property {number} isRenew
+ * @property {number} ipScore
  */
 /**
  * @class
@@ -126,7 +125,7 @@ export class PackageOrder {
     /**
      * @param {PackageOrderConstructor} [options={}]
      */
-    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version }?: PackageOrderConstructor);
+    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version, isRenew, ipScore }?: PackageOrderConstructor);
     /** @type {number | null} */
     id: number | null;
     /** @type {number} */
@@ -155,6 +154,10 @@ export class PackageOrder {
     already_spent_in_usd: number;
     /** @type {number} */
     version: number;
+    /** @type {number} */
+    isRenew: number;
+    /** @type {number} */
+    ipScore: number;
     /**
      * @returns {number}
      */
