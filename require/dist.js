@@ -272,20 +272,20 @@ class PackageOrder {
     }
 }
 class CalculatorInput {
-    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  let proxyFor =  "shared",  let hasUnlimitedIps =  false,  let version =  - 1,  let trafficInGb =  25,  let ownerId =  - 1,  let isRenew =  0,  let ipScore =  0) {
+    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1,  isRenew =  0,  ipScore =  0) {
         const isObject =  currencyOrOptions !==  null &&  typeof currencyOrOptions ===  'object' &&  currencyOrOptions.constructor ===  Object;
         this.currency =  isObject ?  (currencyOrOptions[`currency`] ||  "USD") :  currencyOrOptions;
         this.proxyCount =  isObject ?  (currencyOrOptions[`proxyCount`] ||  100) :  proxyCount;
         this.daysCount =  isObject ?  (currencyOrOptions[`daysCount`] ||  29) :  daysCount;
         this.isRandomProxy =  isObject ?  (currencyOrOptions[`isRandomProxy`] ||  true) :  isRandomProxy;
         this.addedUSDToPerDay =  isObject ?  (currencyOrOptions[`addedUSDToPerDay`] ||  0) :  addedUSDToPerDay;
-        this.let proxyFor =  isObject ?  (currencyOrOptions[`let proxyFor`] ||  "shared") :  let proxyFor;
-        this.let hasUnlimitedIps =  isObject ?  (currencyOrOptions[`let hasUnlimitedIps`] ||  false) :  let hasUnlimitedIps;
-        this.let version =  isObject ?  (currencyOrOptions[`let version`] ||  -  1) :  let version;
-        this.let trafficInGb =  isObject ?  (currencyOrOptions[`let trafficInGb`] ||  25) :  let trafficInGb;
-        this.let ownerId =  isObject ?  (currencyOrOptions[`let ownerId`] ||  -  1) :  let ownerId;
-        this.let isRenew =  isObject ?  (currencyOrOptions[`let isRenew`] ||  0) :  let isRenew;
-        this.let ipScore =  isObject ?  (currencyOrOptions[`let ipScore`] ||  0) :  let ipScore;
+        this.proxyFor =  isObject ?  (currencyOrOptions[`proxyFor`] ||  "shared") :  proxyFor;
+        this.hasUnlimitedIps =  isObject ?  (currencyOrOptions[`hasUnlimitedIps`] ||  false) :  hasUnlimitedIps;
+        this.version =  isObject ?  (currencyOrOptions[`version`] ||  -  1) :  version;
+        this.trafficInGb =  isObject ?  (currencyOrOptions[`trafficInGb`] ||  25) :  trafficInGb;
+        this.ownerId =  isObject ?  (currencyOrOptions[`ownerId`] ||  -  1) :  ownerId;
+        this.isRenew =  isObject ?  (currencyOrOptions[`isRenew`] ||  0) :  isRenew;
+        this.ipScore =  isObject ?  (currencyOrOptions[`ipScore`] ||  0) :  ipScore;
     }
 }
 /*
@@ -400,13 +400,13 @@ class Calculator {
         let daysCount =  options.daysCount;
         let isRandomProxy =  options.isRandomProxy;
         let addedUSDToPerDay =  options.addedUSDToPerDay;
-        let let proxyFor =  options.let proxyFor;
-        let let hasUnlimitedIps =  options.let hasUnlimitedIps;
-        let let version =  options.let version;
-        let let trafficInGb =  options.let trafficInGb;
-        let let ownerId =  options.let ownerId;
-        let let isRenew =  options.let isRenew;
-        let let ipScore =  options.let ipScore;
+        let proxyFor =  options.proxyFor;
+        let hasUnlimitedIps =  options.hasUnlimitedIps;
+        let version =  options.version;
+        let trafficInGb =  options.trafficInGb;
+        let ownerId =  options.ownerId;
+        let isRenew =  options.isRenew;
+        let ipScore =  options.ipScore;
          let myId =  this.isLogged() ?  this.getUserId() :  -  1;
 
         if (daysCount >  28 &&  daysCount <  32) {

@@ -40,12 +40,19 @@ declare class Calculator {
     calculate(options: CalculatorInput): CalculatorOutput;
 }
 export class CalculatorInput {
-    constructor(currencyOrOptions: string, proxyCount: number, daysCount: number, isRandomProxy: boolean, addedUSDToPerDay: number, let: any, proxyFor: string, let: any, hasUnlimitedIps: boolean, let: any, version: number, let: any, trafficInGb: number, let: any, ownerId: number, let: any, isRenew: number, let: any, ipScore?: number);
+    constructor(currencyOrOptions?: string, proxyCount?: number, daysCount?: number, isRandomProxy?: boolean, addedUSDToPerDay?: number, proxyFor?: string, hasUnlimitedIps?: boolean, version?: number, trafficInGb?: number, ownerId?: number, isRenew?: number, ipScore?: number);
     currency: any;
     proxyCount: any;
     daysCount: any;
     isRandomProxy: any;
     addedUSDToPerDay: any;
+    proxyFor: any;
+    hasUnlimitedIps: any;
+    version: any;
+    trafficInGb: any;
+    ownerId: any;
+    isRenew: any;
+    ipScore: any;
 }
 export class CurrencyRates {
     constructor(rates?: {

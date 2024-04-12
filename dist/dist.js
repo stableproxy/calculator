@@ -254,7 +254,7 @@ var PackageOrder = /** @class */ (function () {
 }());
 exports.PackageOrder = PackageOrder;
 var CalculatorInput = /** @class */ (function () {
-    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, let, proxyFor, let, hasUnlimitedIps, let, version, let, trafficInGb, let, ownerId, let, isRenew, let, ipScore) {
+    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore) {
         if (currencyOrOptions === void 0) { currencyOrOptions = "USD"; }
         if (proxyCount === void 0) { proxyCount = 100; }
         if (daysCount === void 0) { daysCount = 29; }
@@ -273,27 +273,13 @@ var CalculatorInput = /** @class */ (function () {
         this.daysCount = isObject ? (currencyOrOptions["daysCount"] || 29) : daysCount;
         this.isRandomProxy = isObject ? (currencyOrOptions["isRandomProxy"] || true) : isRandomProxy;
         this.addedUSDToPerDay = isObject ? (currencyOrOptions["addedUSDToPerDay"] || 0) : addedUSDToPerDay;
-        this.let;
-        proxyFor = isObject ? (currencyOrOptions["let proxyFor"] || "shared") : let;
-        proxyFor;
-        this.let;
-        hasUnlimitedIps = isObject ? (currencyOrOptions["let hasUnlimitedIps"] || false) : let;
-        hasUnlimitedIps;
-        this.let;
-        version = isObject ? (currencyOrOptions["let version"] || -1) : let;
-        version;
-        this.let;
-        trafficInGb = isObject ? (currencyOrOptions["let trafficInGb"] || 25) : let;
-        trafficInGb;
-        this.let;
-        ownerId = isObject ? (currencyOrOptions["let ownerId"] || -1) : let;
-        ownerId;
-        this.let;
-        isRenew = isObject ? (currencyOrOptions["let isRenew"] || 0) : let;
-        isRenew;
-        this.let;
-        ipScore = isObject ? (currencyOrOptions["let ipScore"] || 0) : let;
-        ipScore;
+        this.proxyFor = isObject ? (currencyOrOptions["proxyFor"] || "shared") : proxyFor;
+        this.hasUnlimitedIps = isObject ? (currencyOrOptions["hasUnlimitedIps"] || false) : hasUnlimitedIps;
+        this.version = isObject ? (currencyOrOptions["version"] || -1) : version;
+        this.trafficInGb = isObject ? (currencyOrOptions["trafficInGb"] || 25) : trafficInGb;
+        this.ownerId = isObject ? (currencyOrOptions["ownerId"] || -1) : ownerId;
+        this.isRenew = isObject ? (currencyOrOptions["isRenew"] || 0) : isRenew;
+        this.ipScore = isObject ? (currencyOrOptions["ipScore"] || 0) : ipScore;
     }
     return CalculatorInput;
 }());
@@ -406,13 +392,13 @@ var Calculator = /** @class */ (function () {
         var daysCount = options.daysCount;
         var isRandomProxy = options.isRandomProxy;
         var addedUSDToPerDay = options.addedUSDToPerDay;
-        var let, proxyFor = options.let, proxyFor;
-        var let, hasUnlimitedIps = options.let, hasUnlimitedIps;
-        var let, version = options.let, version;
-        var let, trafficInGb = options.let, trafficInGb;
-        var let, ownerId = options.let, ownerId;
-        var let, isRenew = options.let, isRenew;
-        var let, ipScore = options.let, ipScore;
+        var proxyFor = options.proxyFor;
+        var hasUnlimitedIps = options.hasUnlimitedIps;
+        var version = options.version;
+        var trafficInGb = options.trafficInGb;
+        var ownerId = options.ownerId;
+        var isRenew = options.isRenew;
+        var ipScore = options.ipScore;
         var myId = this.isLogged() ? this.getUserId() : -1;
         if (daysCount > 28 && daysCount < 32) {
             daysCount = 29;
