@@ -421,6 +421,13 @@ class Calculator {
         } let oneProxyPriceInUsd =  ( (0.03 *  3) /  29) *  daysCount;
          let proxyAllPriceInUsd =  1;
 
+        if (proxyFor ==  "residential_static_gb") {
+             let oneIpPrice =  3;
+             let oneGbPrice =  3;
+             oneProxyPriceInUsd =  3;
+             proxyAllPriceInUsd =  oneIpPrice +  oneGbPrice *  trafficInGb;
+
+        }
         if (isResidential) {
              let gbPrices =  {
                  "1":  1.65,
