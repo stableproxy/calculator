@@ -422,11 +422,12 @@ var Calculator = /** @class */ (function () {
         var oneProxyPriceInUsd = ((0.03 * 3) / 29) * daysCount;
         var proxyAllPriceInUsd = 1;
         if (proxyFor == "residential_static_gb") {
-            var oneIpPrice = 3;
+            var oneIpPrice = 2;
             var oneGbPrice = 3;
             var ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
-            oneProxyPriceInUsd = 3;
-            proxyAllPriceInUsd = ipsPrice + (oneGbPrice * trafficInGb);
+            var gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
+            oneProxyPriceInUsd = oneGbPrice;
+            proxyAllPriceInUsd = ipsPrice + gbsPrice;
         }
         else if (isResidential) {
             var gbPrices = {

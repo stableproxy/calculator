@@ -437,11 +437,12 @@
              let proxyAllPriceInUsd =  1;
 
             if (proxyFor ==  "residential_static_gb") {
-                 let oneIpPrice =  3;
+                 let oneIpPrice =  2;
                  let oneGbPrice =  3;
                  let ipsPrice =  isRenew >  1 ?  0 :  (proxyCount *  oneIpPrice);
-                 oneProxyPriceInUsd =  3;
-                 proxyAllPriceInUsd =  ipsPrice +  (oneGbPrice *  trafficInGb);
+                 let gbsPrice =  isRenew ==  1 ?  0 :  (oneGbPrice *  trafficInGb);
+                 oneProxyPriceInUsd =  oneGbPrice;
+                 proxyAllPriceInUsd =  ipsPrice +  gbsPrice;
 
             }
             else
