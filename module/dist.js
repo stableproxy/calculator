@@ -480,6 +480,27 @@ class Calculator {
 
                 }
             }
+            else
+            if (String.prototype.endsWith.call(proxyFor,  "static_gb")) {
+                 oneGbPrice =  0.5;
+                 oneIpPrice =  20;
+
+                if (daysCount <=  3) {
+                     oneIpPrice =  3;
+                     oneGbPrice =  1;
+
+                }
+                else
+                if (daysCount >=  3 &&  daysCount <=  18) {
+                     oneIpPrice =  12;
+                     oneGbPrice =  0.75;
+
+                } ipsPrice =  isRenew >  1 ?  0 :  (proxyCount *  oneIpPrice);
+                 gbsPrice =  isRenew ==  1 ?  0 :  (oneGbPrice *  trafficInGb);
+                 oneProxyPriceInUsd =  oneGbPrice;
+                 proxyAllPriceInUsd =  ipsPrice +  gbsPrice;
+
+            }
             else {
                  oneProxyPriceInUsd =  0.85;
                  proxyAllPriceInUsd =  oneProxyPriceInUsd *  proxyCount;
