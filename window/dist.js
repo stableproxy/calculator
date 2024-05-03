@@ -645,6 +645,7 @@
                     }
                     /* ----- Count discount ----- */
                      proxyAllPriceInUsd =  (proxyCount *  oneProxyPriceInUsd) *  discount;
+                     proxyAllPriceInUsd =  proxyAllPriceInUsd +  priceTraffic;
 
                     /* ----- Day pricing ----- */
 
@@ -668,7 +669,7 @@
 
                     }
                     /* ----- Day pricing ----- */
-                     proxyAllPriceInUsd =  proxyAllPriceInUsd +  priceTraffic +  addService;
+                     proxyAllPriceInUsd =  proxyAllPriceInUsd +  addService;
 
                 }
                 else {

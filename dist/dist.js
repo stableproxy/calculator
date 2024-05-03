@@ -562,6 +562,7 @@ var Calculator = /** @class */ (function () {
                 }
                 /* ----- Count discount ----- */
                 proxyAllPriceInUsd = (proxyCount * oneProxyPriceInUsd) * discount;
+                proxyAllPriceInUsd = proxyAllPriceInUsd + priceTraffic;
                 /* ----- Day pricing ----- */
                 if (daysCount > 33) {
                     proxyAllPriceInUsd = proxyAllPriceInUsd * 11;
@@ -576,7 +577,7 @@ var Calculator = /** @class */ (function () {
                     proxyAllPriceInUsd = (proxyAllPriceInUsd / 4) * 1.4;
                 }
                 /* ----- Day pricing ----- */
-                proxyAllPriceInUsd = proxyAllPriceInUsd + priceTraffic + addService;
+                proxyAllPriceInUsd = proxyAllPriceInUsd + addService;
             }
             else {
                 if (proxyFor == "private") {
