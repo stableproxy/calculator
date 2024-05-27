@@ -60,12 +60,14 @@ export class CurrencyRates {
         GBP: number;
         UAH: number;
         USD: number;
+        PLN: number;
     });
     rates: {
         EUR: number;
         GBP: number;
         UAH: number;
         USD: number;
+        PLN: number;
     };
     get(currency: any): any;
     format(value: any, currency: any): string;

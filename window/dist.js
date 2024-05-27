@@ -109,10 +109,11 @@
     }
     class CurrencyRates {
         constructor(rates =  {
-            EUR:  0.91,
-             GBP:  0.8,
-             UAH:  37.08,
-             USD:  1
+            EUR:  0.92,
+             GBP:  0.79,
+             UAH:  41.12,
+             USD:  1,
+             PLN:  3.92
         }) {
             this.rates =  rates;
         }
@@ -769,7 +770,7 @@
                 }
             } let proxyAllPriceInUsdWithSale =  proxyAllPriceInUsd /  salePercentage;
              let saleAmountInUSD =  proxyAllPriceInUsd -  proxyAllPriceInUsdWithSale;
-             proxyAllPriceInUsd =  proxyAllPriceInUsdWithSale;
+             proxyAllPriceInUsd =  proxyAllPriceInUsd -  saleAmountInUSD;
 
             if (addedUSDToPerDay >  0) {
                  proxyAllPriceInUsd +=  addedUSDToPerDay *  daysCount;
