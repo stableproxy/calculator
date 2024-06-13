@@ -109,7 +109,7 @@ class CalcUtils {
 class CurrencyRates {
     constructor(rates =  {
         EUR:  0.92,
-         GBP:  0.79,
+         GBP:  0.78,
          UAH:  41.12,
          USD:  1,
          PLN:  3.92
@@ -273,7 +273,7 @@ class PackageOrder {
     }
 }
 class CalculatorInput {
-    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1,  isRenew =  0,  ipScore =  0) {
+    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1,  isRenew =  0,  ipScore =  0,  service =  null) {
         const isObject =  currencyOrOptions !==  null &&  typeof currencyOrOptions ===  'object' &&  currencyOrOptions.constructor ===  Object;
         this.currency =  isObject ?  (currencyOrOptions[`currency`] ||  "USD") :  currencyOrOptions;
         this.proxyCount =  isObject ?  (currencyOrOptions[`proxyCount`] ||  100) :  proxyCount;
@@ -287,6 +287,7 @@ class CalculatorInput {
         this.ownerId =  isObject ?  (currencyOrOptions[`ownerId`] ||  -  1) :  ownerId;
         this.isRenew =  isObject ?  (currencyOrOptions[`isRenew`] ||  0) :  isRenew;
         this.ipScore =  isObject ?  (currencyOrOptions[`ipScore`] ||  0) :  ipScore;
+        this.service =  isObject ?  (currencyOrOptions[`service`] ||  null) :  service;
     }
 }
 /*
@@ -408,6 +409,7 @@ class Calculator {
         let ownerId =  options.ownerId;
         let isRenew =  options.isRenew;
         let ipScore =  options.ipScore;
+        let service =  options.service;
          let myId =  this.isLogged() ?  this.getUserId() :  -  1;
 
         if (daysCount >  28 &&  daysCount <  32) {

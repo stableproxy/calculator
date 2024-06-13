@@ -107,7 +107,7 @@ var CurrencyRates = /** @class */ (function () {
     function CurrencyRates(rates) {
         if (rates === void 0) { rates = {
             EUR: 0.92,
-            GBP: 0.79,
+            GBP: 0.78,
             UAH: 41.12,
             USD: 1,
             PLN: 3.92
@@ -255,7 +255,7 @@ var PackageOrder = /** @class */ (function () {
 }());
 exports.PackageOrder = PackageOrder;
 var CalculatorInput = /** @class */ (function () {
-    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore) {
+    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore, service) {
         if (currencyOrOptions === void 0) { currencyOrOptions = "USD"; }
         if (proxyCount === void 0) { proxyCount = 100; }
         if (daysCount === void 0) { daysCount = 29; }
@@ -268,6 +268,7 @@ var CalculatorInput = /** @class */ (function () {
         if (ownerId === void 0) { ownerId = -1; }
         if (isRenew === void 0) { isRenew = 0; }
         if (ipScore === void 0) { ipScore = 0; }
+        if (service === void 0) { service = null; }
         var isObject = currencyOrOptions !== null && typeof currencyOrOptions === 'object' && currencyOrOptions.constructor === Object;
         this.currency = isObject ? (currencyOrOptions["currency"] || "USD") : currencyOrOptions;
         this.proxyCount = isObject ? (currencyOrOptions["proxyCount"] || 100) : proxyCount;
@@ -281,6 +282,7 @@ var CalculatorInput = /** @class */ (function () {
         this.ownerId = isObject ? (currencyOrOptions["ownerId"] || -1) : ownerId;
         this.isRenew = isObject ? (currencyOrOptions["isRenew"] || 0) : isRenew;
         this.ipScore = isObject ? (currencyOrOptions["ipScore"] || 0) : ipScore;
+        this.service = isObject ? (currencyOrOptions["service"] || null) : service;
     }
     return CalculatorInput;
 }());
@@ -400,6 +402,7 @@ var Calculator = /** @class */ (function () {
         var ownerId = options.ownerId;
         var isRenew = options.isRenew;
         var ipScore = options.ipScore;
+        var service = options.service;
         var myId = this.isLogged() ? this.getUserId() : -1;
         if (daysCount > 28 && daysCount < 32) {
             daysCount = 29;
