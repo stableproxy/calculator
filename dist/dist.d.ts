@@ -16,6 +16,7 @@ export type PackageOrderConstructor = {
     version: number;
     isRenew: number;
     ipScore: number;
+    service?: number;
 };
 declare class Calculator {
     /**
@@ -127,6 +128,7 @@ export class CalcUtils {
  * @property {number} version
  * @property {number} isRenew
  * @property {number} ipScore
+ * @property {number} [service]
  */
 /**
  * @class
@@ -135,7 +137,7 @@ export class PackageOrder {
     /**
      * @param {PackageOrderConstructor} [options={}]
      */
-    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version, isRenew, ipScore }?: PackageOrderConstructor);
+    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version, isRenew, ipScore, service, }?: PackageOrderConstructor);
     /** @type {number | null} */
     id: number | null;
     /** @type {number} */
@@ -168,6 +170,8 @@ export class PackageOrder {
     isRenew: number;
     /** @type {number} */
     ipScore: number;
+    /** @type {string} */
+    service: string;
     /**
      * @returns {number}
      */

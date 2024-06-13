@@ -160,6 +160,7 @@ exports.CurrencyRates = CurrencyRates;
  * @property {number} version
  * @property {number} isRenew
  * @property {number} ipScore
+ * @property {number} [service]
  */
 /**
  * @class
@@ -169,7 +170,7 @@ var PackageOrder = /** @class */ (function () {
      * @param {PackageOrderConstructor} [options={}]
      */
     function PackageOrder(_a) {
-        var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version, isRenew = _b.isRenew, ipScore = _b.ipScore;
+        var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version, isRenew = _b.isRenew, ipScore = _b.ipScore, service = _b.service;
         /** @type {number | null} */
         this.id = id || null;
         /** @type {number} */
@@ -202,6 +203,8 @@ var PackageOrder = /** @class */ (function () {
         this.isRenew = isRenew || 0;
         /** @type {number} */
         this.ipScore = ipScore || 0;
+        /** @type {string} */
+        this.service = service || null;
     }
     Object.defineProperty(PackageOrder.prototype, "traffic_in_gb", {
         /**
@@ -240,7 +243,7 @@ var PackageOrder = /** @class */ (function () {
      */
     PackageOrder.prototype.getRenewPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore, this.service));
     };
     /**
      * @param {Calculator} calculator
@@ -249,7 +252,7 @@ var PackageOrder = /** @class */ (function () {
      */
     PackageOrder.prototype.getPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service));
     };
     return PackageOrder;
 }());

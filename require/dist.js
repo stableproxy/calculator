@@ -160,6 +160,7 @@ class CurrencyRates {
  * @property {number} version
  * @property {number} isRenew
  * @property {number} ipScore
+ * @property {number} [service]
  */
 
 /**
@@ -186,7 +187,9 @@ class PackageOrder {
         already_spent_in_usd,
         version,
         isRenew,
-        ipScore
+        ipScore,
+        service,
+
     } =  {}) {
 
         /** @type {number | null} */
@@ -236,6 +239,9 @@ class PackageOrder {
 
         /** @type {number} */
          this.ipScore =  ipScore ||  0;
+
+        /** @type {string} */
+         this.service =  service ||  null;
     }
     /**
 	 * @returns {number}
@@ -261,7 +267,7 @@ class PackageOrder {
 	 * @returns {CalculatorOutput}
 	 */
     getRenewPrices(calculator,  currency =  null) {
-        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore));
+        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore, this.service));
     }
     /**
 	 * @param {Calculator} calculator
@@ -269,7 +275,7 @@ class PackageOrder {
 	 * @returns {CalculatorOutput}
 	 */
     getPrices(calculator,  currency =  null) {
-        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore));
+        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service));
     }
 }
 class CalculatorInput {
