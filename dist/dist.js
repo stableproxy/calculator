@@ -160,7 +160,7 @@ exports.CurrencyRates = CurrencyRates;
  * @property {number} version
  * @property {number} isRenew
  * @property {number} ipScore
- * @property {number} [service]
+ * @property {string | null} [service]
  */
 /**
  * @class
@@ -203,7 +203,7 @@ var PackageOrder = /** @class */ (function () {
         this.isRenew = isRenew || 0;
         /** @type {number} */
         this.ipScore = ipScore || 0;
-        /** @type {string} */
+        /** @type {string | null} */
         this.service = service || null;
     }
     Object.defineProperty(PackageOrder.prototype, "traffic_in_gb", {
