@@ -673,6 +673,22 @@ class Calculator {
                 /* ----- Day pricing ----- */
                  proxyAllPriceInUsd =  proxyAllPriceInUsd +  addService;
 
+                /* ----- Service ----- */
+
+                if (service &&  service !=  'overall') {
+                     proxyAllPriceInUsd +=  1;
+
+                }
+                /* ----- Service ----- */
+
+                /* ----- Ip Score ----- */
+
+                if (ipScore >  70) {
+                     proxyAllPriceInUsd =  proxyAllPriceInUsd *  1.15;
+
+                }
+                /* ----- Ip Score ----- */
+
             }
             else {
 
