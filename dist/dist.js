@@ -591,8 +591,8 @@ var Calculator = /** @class */ (function () {
                 }
                 /* ----- Service ----- */
                 /* ----- Ip Score ----- */
-                if (ipScore > 70) {
-                    proxyAllPriceInUsd = proxyAllPriceInUsd * 1.15;
+                if (ipScore >= 70) {
+                    proxyAllPriceInUsd = proxyAllPriceInUsd * 1.25;
                 }
                 /* ----- Ip Score ----- */
             }
