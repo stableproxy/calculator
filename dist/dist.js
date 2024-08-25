@@ -527,7 +527,7 @@ var Calculator = /** @class */ (function () {
                     oneProxyPriceInUsd = 0.08;
                 }
                 if (version >= 31 && !isRandomProxy) {
-                    proxyALlPriceInUsdPre = 0;
+                    var LproxyALlPriceInUsdPre = 0;
                     var typedPriceMultipliers = {
                         "shared": {
                             "UA": 2
@@ -539,9 +539,12 @@ var Calculator = /** @class */ (function () {
                         var country = _a[_i];
                         var ipMultiple = priceMultiplied[country] || 1;
                         var count = countries[country] || 0;
-                        proxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
+                        LproxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
                     }
-                    console.debug(" [SPC]", proxyALlPriceInUsdPre, (proxyCount * oneProxyPriceInUsd));
+                    console.debug(" [SPC]", LproxyALlPriceInUsdPre, proxyALlPriceInUsdPre);
+                    if (LproxyALlPriceInUsdPre < proxyALlPriceInUsdPre) {
+                        proxyALlPriceInUsdPre = LproxyALlPriceInUsdPre;
+                    }
                 }
                 /* ----- Count ----- */
                 /* ----- Traffic ----- */

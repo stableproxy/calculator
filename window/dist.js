@@ -567,7 +567,7 @@
 
                     }
                     if (version >=  31 &&  !  isRandomProxy) {
-                         proxyALlPriceInUsdPre =  0;
+                         let LproxyALlPriceInUsdPre =  0;
                          let typedPriceMultipliers =  {
                              "shared":  {
                                  "UA":  2
@@ -579,10 +579,14 @@
                         for (let country of Object.keys(countries)) {
                              let ipMultiple =  priceMultiplied[country] ||  1;
                              let count =  countries[country] ||  0;
-                             proxyALlPriceInUsdPre +=  oneProxyPriceInUsd *  ipMultiple *  count;
+                             LproxyALlPriceInUsdPre +=  oneProxyPriceInUsd *  ipMultiple *  count;
 
-                        } console.debug(` [SPC]`,  proxyALlPriceInUsdPre,  (proxyCount *  oneProxyPriceInUsd));
+                        } console.debug(` [SPC]`,  LproxyALlPriceInUsdPre,  proxyALlPriceInUsdPre);
 
+                        if (LproxyALlPriceInUsdPre <  proxyALlPriceInUsdPre) {
+                             proxyALlPriceInUsdPre =  LproxyALlPriceInUsdPre;
+
+                        }
                     }
                     /* ----- Count ----- */
 
