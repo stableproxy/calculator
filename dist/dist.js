@@ -38,6 +38,27 @@ var Lang = /** @class */ (function () {
 var CalcUtils = /** @class */ (function () {
     function CalcUtils() {
     }
+    /**
+     * @param {*} value
+     * @returns {boolean}
+     */
+    CalcUtils.is_empty = function (value) {
+        if (Array.isArray(value)) {
+            return value.length === 0;
+        }
+        else if (typeof value === 'object') {
+            return Object.keys(value).length === 0;
+        }
+        return value === undefined || value === null || value === '';
+    };
+    /**
+     * @param {string | number} key
+     * @param {Record<any, any>} array
+     * @returns {boolean}
+     */
+    CalcUtils.array_key_exists = function (key, array) {
+        return key in array;
+    };
     CalcUtils.is_numeric = function (value) {
         if ((undefined === value) || (null === value)) {
             return false;
@@ -144,23 +165,23 @@ var CurrencyRates = /** @class */ (function () {
 exports.CurrencyRates = CurrencyRates;
 /**
  * @typedef {Object} PackageOrderConstructor
- * @property {number | null} id
- * @property {number} count
- * @property {number} traffic_amount
- * @property {string} traffic_unit
- * @property {number} period_amount
- * @property {string} period_unit
- * @property {Record<string, number>} countries
- * @property {string} currency
- * @property {number} added_price_per_day
- * @property {string} type
- * @property {boolean} has_unlimited_auth_ips
- * @property {number} user_id
- * @property {number} already_spent_in_usd
- * @property {number} version
- * @property {number} isRenew
- * @property {number} ipScore
- * @property {string | null} [service]
+ * @property {number | null | undefined} id
+ * @property {number=} count
+ * @property {number=} traffic_amount
+ * @property {string=} traffic_unit
+ * @property {number=} period_amount
+ * @property {string=} period_unit
+ * @property {Record<string, number>=} countries
+ * @property {string=} currency
+ * @property {number=} added_price_per_day
+ * @property {string=} type
+ * @property {boolean=} has_unlimited_auth_ips
+ * @property {number=} user_id
+ * @property {number=} already_spent_in_usd
+ * @property {number=} version
+ * @property {number=} isRenew
+ * @property {number=} ipScore
+ * @property {string | null | undefined} [service]
  */
 /**
  * @class
@@ -243,7 +264,7 @@ var PackageOrder = /** @class */ (function () {
      */
     PackageOrder.prototype.getRenewPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore, this.service));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore, this.service, this.countries));
     };
     /**
      * @param {Calculator} calculator
@@ -252,13 +273,13 @@ var PackageOrder = /** @class */ (function () {
      */
     PackageOrder.prototype.getPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service, this.countries));
     };
     return PackageOrder;
 }());
 exports.PackageOrder = PackageOrder;
 var CalculatorInput = /** @class */ (function () {
-    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore, service) {
+    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore, service, countries) {
         if (currencyOrOptions === void 0) { currencyOrOptions = "USD"; }
         if (proxyCount === void 0) { proxyCount = 100; }
         if (daysCount === void 0) { daysCount = 29; }
@@ -272,6 +293,7 @@ var CalculatorInput = /** @class */ (function () {
         if (isRenew === void 0) { isRenew = 0; }
         if (ipScore === void 0) { ipScore = 0; }
         if (service === void 0) { service = null; }
+        if (countries === void 0) { countries = {}; }
         var isObject = currencyOrOptions !== null && typeof currencyOrOptions === 'object' && currencyOrOptions.constructor === Object;
         this.currency = isObject ? (currencyOrOptions["currency"] || "USD") : currencyOrOptions;
         this.proxyCount = isObject ? (currencyOrOptions["proxyCount"] || 100) : proxyCount;
@@ -286,6 +308,7 @@ var CalculatorInput = /** @class */ (function () {
         this.isRenew = isObject ? (currencyOrOptions["isRenew"] || 0) : isRenew;
         this.ipScore = isObject ? (currencyOrOptions["ipScore"] || 0) : ipScore;
         this.service = isObject ? (currencyOrOptions["service"] || null) : service;
+        this.countries = isObject ? (currencyOrOptions["countries"] || {}) : countries;
     }
     return CalculatorInput;
 }());
@@ -406,12 +429,14 @@ var Calculator = /** @class */ (function () {
         var isRenew = options.isRenew;
         var ipScore = options.ipScore;
         var service = options.service;
+        var countries = options.countries;
+        console.debug(" [SPC]", "If you see, this is debug visible.");
         var myId = this.isLogged() ? this.getUserId() : -1;
         if (daysCount > 28 && daysCount < 32) {
             daysCount = 29;
         }
         if (version == -1) {
-            version = 30;
+            version = 31;
         }
         if (ownerId == -1) {
             ownerId = myId;
@@ -493,12 +518,30 @@ var Calculator = /** @class */ (function () {
                 oneProxyPriceInUsd = 0;
                 var addService = 0;
                 var discount = 0;
+                var proxyALlPriceInUsdPre = proxyCount * oneProxyPriceInUsd;
                 /* ----- Count ----- */
                 if (proxyFor == "private") {
                     oneProxyPriceInUsd = 0.9;
                 }
                 else if (proxyFor == "shared") {
                     oneProxyPriceInUsd = 0.08;
+                }
+                if (version >= 31 && !isRandomProxy) {
+                    proxyALlPriceInUsdPre = 0;
+                    var typedPriceMultipliers = {
+                        "shared": {
+                            "UA": 2
+                        }
+                    };
+                    var priceMultiplied = typedPriceMultipliers[proxyFor] || [];
+                    // for on countries
+                    for (var _i = 0, _a = Object.keys(countries); _i < _a.length; _i++) {
+                        var country = _a[_i];
+                        var ipMultiple = priceMultiplied[country] || 1;
+                        var count = countries[country] || 0;
+                        proxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
+                    }
+                    console.debug(" [SPC]", proxyALlPriceInUsdPre, (proxyCount * oneProxyPriceInUsd));
                 }
                 /* ----- Count ----- */
                 /* ----- Traffic ----- */
@@ -568,7 +611,7 @@ var Calculator = /** @class */ (function () {
                     }
                 }
                 /* ----- Count discount ----- */
-                proxyAllPriceInUsd = (proxyCount * oneProxyPriceInUsd) * discount;
+                proxyAllPriceInUsd = (proxyALlPriceInUsdPre) * discount;
                 proxyAllPriceInUsd = proxyAllPriceInUsd + priceTraffic;
                 /* ----- Day pricing ----- */
                 if (daysCount > 33) {

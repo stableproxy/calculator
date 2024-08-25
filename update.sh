@@ -1,11 +1,2 @@
-cd ../../../
-
-echo "CUrrent root directory: $(pwd)"
-
-php artisan js:generate-calculator-module
-
-echo "Done, calculator module updated!"
-
-cd ./public/js/calculator\
-
-sh upload.sh
+sh ./update_local.sh
+sh ./upload.sh

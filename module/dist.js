@@ -33,6 +33,27 @@ class Lang {
     }
 }
 class CalcUtils {
+    /**
+	 * @param {*} value
+	 * @returns {boolean}
+	 */
+    static is_empty(value) {
+        if (Array.isArray(value)) {
+            return value.length ===  0;
+        } else
+        if (typeof value ===  'object') {
+            return Object.keys(value).length ===  0;
+        }
+        return value ===  undefined ||  value ===  null ||  value ===  '';
+    }
+    /**
+	 * @param {string | number} key
+	 * @param {Record<any, any>} array
+	 * @returns {boolean}
+	 */
+    static array_key_exists(key,  array) {
+        return key in  array;
+    }
     static is_numeric(value) {
         if (
         (undefined ===  value) ||  (null ===  value)) {
@@ -144,23 +165,23 @@ class CurrencyRates {
 }
 /**
  * @typedef {Object} PackageOrderConstructor
- * @property {number | null} id
- * @property {number} count
- * @property {number} traffic_amount
- * @property {string} traffic_unit
- * @property {number} period_amount
- * @property {string} period_unit
- * @property {Record<string, number>} countries
- * @property {string} currency
- * @property {number} added_price_per_day
- * @property {string} type
- * @property {boolean} has_unlimited_auth_ips
- * @property {number} user_id
- * @property {number} already_spent_in_usd
- * @property {number} version
- * @property {number} isRenew
- * @property {number} ipScore
- * @property {string | null} [service]
+ * @property {number | null | undefined} id
+ * @property {number=} count
+ * @property {number=} traffic_amount
+ * @property {string=} traffic_unit
+ * @property {number=} period_amount
+ * @property {string=} period_unit
+ * @property {Record<string, number>=} countries
+ * @property {string=} currency
+ * @property {number=} added_price_per_day
+ * @property {string=} type
+ * @property {boolean=} has_unlimited_auth_ips
+ * @property {number=} user_id
+ * @property {number=} already_spent_in_usd
+ * @property {number=} version
+ * @property {number=} isRenew
+ * @property {number=} ipScore
+ * @property {string | null | undefined} [service]
  */
 
 /**
@@ -188,8 +209,7 @@ class PackageOrder {
         version,
         isRenew,
         ipScore,
-        service,
-
+        service
     } =  {}) {
 
         /** @type {number | null} */
@@ -267,7 +287,7 @@ class PackageOrder {
 	 * @returns {CalculatorOutput}
 	 */
     getRenewPrices(calculator,  currency =  null) {
-        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore, this.service));
+        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore, this.service, this.countries));
     }
     /**
 	 * @param {Calculator} calculator
@@ -275,11 +295,11 @@ class PackageOrder {
 	 * @returns {CalculatorOutput}
 	 */
     getPrices(calculator,  currency =  null) {
-        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service));
+        return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service, this.countries));
     }
 }
 class CalculatorInput {
-    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1,  isRenew =  0,  ipScore =  0,  service =  null) {
+    constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1,  isRenew =  0,  ipScore =  0,  service =  null,  countries =  {}) {
         const isObject =  currencyOrOptions !==  null &&  typeof currencyOrOptions ===  'object' &&  currencyOrOptions.constructor ===  Object;
         this.currency =  isObject ?  (currencyOrOptions[`currency`] ||  "USD") :  currencyOrOptions;
         this.proxyCount =  isObject ?  (currencyOrOptions[`proxyCount`] ||  100) :  proxyCount;
@@ -294,6 +314,7 @@ class CalculatorInput {
         this.isRenew =  isObject ?  (currencyOrOptions[`isRenew`] ||  0) :  isRenew;
         this.ipScore =  isObject ?  (currencyOrOptions[`ipScore`] ||  0) :  ipScore;
         this.service =  isObject ?  (currencyOrOptions[`service`] ||  null) :  service;
+        this.countries =  isObject ?  (currencyOrOptions[`countries`] ||  {}) :  countries;
     }
 }
 /*
@@ -416,6 +437,8 @@ class Calculator {
         let isRenew =  options.isRenew;
         let ipScore =  options.ipScore;
         let service =  options.service;
+        let countries =  options.countries;
+         console.debug(` [SPC]`,  "If you see, this is debug visible.");
          let myId =  this.isLogged() ?  this.getUserId() :  -  1;
 
         if (daysCount >  28 &&  daysCount <  32) {
@@ -423,7 +446,7 @@ class Calculator {
 
         }
         if (version ==  -  1) {
-             version =  30;
+             version =  31;
 
         }
         if (ownerId ==  -  1) {
@@ -529,6 +552,7 @@ class Calculator {
                  oneProxyPriceInUsd =  0;
                  let addService =  0;
                  let discount =  0;
+                 let proxyALlPriceInUsdPre =  proxyCount *  oneProxyPriceInUsd;
 
                 /* ----- Count ----- */
 
@@ -539,6 +563,24 @@ class Calculator {
                 else
                 if (proxyFor ==  "shared") {
                      oneProxyPriceInUsd =  0.08;
+
+                }
+                if (version >=  31 &&  !  isRandomProxy) {
+                     proxyALlPriceInUsdPre =  0;
+                     let typedPriceMultipliers =  {
+                         "shared":  {
+                             "UA":  2
+                        }
+                    };
+                     let priceMultiplied =  typedPriceMultipliers[proxyFor] ||  [];
+                     // for on countries
+
+                    for (let country of Object.keys(countries)) {
+                         let ipMultiple =  priceMultiplied[country] ||  1;
+                         let count =  countries[country] ||  0;
+                         proxyALlPriceInUsdPre +=  oneProxyPriceInUsd *  ipMultiple *  count;
+
+                    } console.debug(` [SPC]`,  proxyALlPriceInUsdPre,  (proxyCount *  oneProxyPriceInUsd));
 
                 }
                 /* ----- Count ----- */
@@ -652,7 +694,7 @@ class Calculator {
                     }
                 }
                 /* ----- Count discount ----- */
-                 proxyAllPriceInUsd =  (proxyCount *  oneProxyPriceInUsd) *  discount;
+                 proxyAllPriceInUsd =  (proxyALlPriceInUsdPre) *  discount;
                  proxyAllPriceInUsd =  proxyAllPriceInUsd +  priceTraffic;
 
                 /* ----- Day pricing ----- */
