@@ -16,7 +16,7 @@ export type PackageOrderConstructor = {
     version?: number | undefined;
     isRenew?: number | undefined;
     ipScore?: number | undefined;
-    service?: string | null;
+    service: string | null;
 };
 declare class Calculator {
     /**
@@ -140,7 +140,7 @@ export class CalcUtils {
  * @property {number=} version
  * @property {number=} isRenew
  * @property {number=} ipScore
- * @property {string | null} [service]
+ * @property {string | null} service
  */
 /**
  * @class

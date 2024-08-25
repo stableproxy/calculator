@@ -182,7 +182,7 @@
  * @property {number=} version
  * @property {number=} isRenew
  * @property {number=} ipScore
- * @property {string | null} [service]
+ * @property {string | null} service
  */
 
     /**
