@@ -583,7 +583,7 @@
 
                         } console.debug(` [SPC]`,  LproxyALlPriceInUsdPre,  proxyALlPriceInUsdPre);
 
-                        if (LproxyALlPriceInUsdPre <  proxyALlPriceInUsdPre) {
+                        if (LproxyALlPriceInUsdPre >  proxyALlPriceInUsdPre) {
                              proxyALlPriceInUsdPre =  LproxyALlPriceInUsdPre;
 
                         }

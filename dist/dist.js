@@ -542,7 +542,7 @@ var Calculator = /** @class */ (function () {
                         LproxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
                     }
                     console.debug(" [SPC]", LproxyALlPriceInUsdPre, proxyALlPriceInUsdPre);
-                    if (LproxyALlPriceInUsdPre < proxyALlPriceInUsdPre) {
+                    if (LproxyALlPriceInUsdPre > proxyALlPriceInUsdPre) {
                         proxyALlPriceInUsdPre = LproxyALlPriceInUsdPre;
                     }
                 }
