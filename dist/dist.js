@@ -165,7 +165,7 @@ var CurrencyRates = /** @class */ (function () {
 exports.CurrencyRates = CurrencyRates;
 /**
  * @typedef {Object} PackageOrderConstructor
- * @property {number | null=} id
+ * @property {number | null} id
  * @property {number=} count
  * @property {number=} traffic_amount
  * @property {string=} traffic_unit
@@ -181,7 +181,7 @@ exports.CurrencyRates = CurrencyRates;
  * @property {number=} version
  * @property {number=} isRenew
  * @property {number=} ipScore
- * @property {string | null=} [service]
+ * @property {string | null} [service]
  */
 /**
  * @class
