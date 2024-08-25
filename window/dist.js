@@ -166,7 +166,7 @@
     }
     /**
  * @typedef {Object} PackageOrderConstructor
- * @property {number | null | undefined} id
+ * @property {number | null=} id
  * @property {number=} count
  * @property {number=} traffic_amount
  * @property {string=} traffic_unit
@@ -182,7 +182,7 @@
  * @property {number=} version
  * @property {number=} isRenew
  * @property {number=} ipScore
- * @property {string | null | undefined} [service]
+ * @property {string | null=} [service]
  */
 
     /**

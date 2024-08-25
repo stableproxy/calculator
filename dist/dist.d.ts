@@ -1,6 +1,6 @@
 export default Calculator;
 export type PackageOrderConstructor = {
-    id: number | null | undefined;
+    id?: (number | null) | undefined;
     count?: number | undefined;
     traffic_amount?: number | undefined;
     traffic_unit?: string | undefined;
@@ -16,7 +16,7 @@ export type PackageOrderConstructor = {
     version?: number | undefined;
     isRenew?: number | undefined;
     ipScore?: number | undefined;
-    service?: string | null | undefined;
+    service?: (string | null) | undefined;
 };
 declare class Calculator {
     /**
@@ -124,7 +124,7 @@ export class CalcUtils {
 }
 /**
  * @typedef {Object} PackageOrderConstructor
- * @property {number | null | undefined} id
+ * @property {number | null=} id
  * @property {number=} count
  * @property {number=} traffic_amount
  * @property {string=} traffic_unit
@@ -140,7 +140,7 @@ export class CalcUtils {
  * @property {number=} version
  * @property {number=} isRenew
  * @property {number=} ipScore
- * @property {string | null | undefined} [service]
+ * @property {string | null=} [service]
  */
 /**
  * @class
