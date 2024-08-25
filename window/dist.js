@@ -553,7 +553,6 @@
                      oneProxyPriceInUsd =  0;
                      let addService =  0;
                      let discount =  0;
-                     let proxyALlPriceInUsdPre =  proxyCount *  oneProxyPriceInUsd;
 
                     /* ----- Count ----- */
 
@@ -565,7 +564,8 @@
                     if (proxyFor ==  "shared") {
                          oneProxyPriceInUsd =  0.08;
 
-                    }
+                    } let proxyALlPriceInUsdPre =  proxyCount *  oneProxyPriceInUsd;
+
                     if (version >=  31 &&  !  isRandomProxy) {
                          let LproxyALlPriceInUsdPre =  0;
                          let typedPriceMultipliers =  {

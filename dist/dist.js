@@ -518,7 +518,6 @@ var Calculator = /** @class */ (function () {
                 oneProxyPriceInUsd = 0;
                 var addService = 0;
                 var discount = 0;
-                var proxyALlPriceInUsdPre = proxyCount * oneProxyPriceInUsd;
                 /* ----- Count ----- */
                 if (proxyFor == "private") {
                     oneProxyPriceInUsd = 0.9;
@@ -526,6 +525,7 @@ var Calculator = /** @class */ (function () {
                 else if (proxyFor == "shared") {
                     oneProxyPriceInUsd = 0.08;
                 }
+                var proxyALlPriceInUsdPre = proxyCount * oneProxyPriceInUsd;
                 if (version >= 31 && !isRandomProxy) {
                     var LproxyALlPriceInUsdPre = 0;
                     var typedPriceMultipliers = {
