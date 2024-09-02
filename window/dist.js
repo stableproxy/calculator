@@ -439,7 +439,6 @@
             let ipScore =  options.ipScore;
             let service =  options.service;
             let countries =  options.countries;
-             console.debug(` [SPC]`,  "If you see, this is debug visible.");
              let myId =  this.isLogged() ?  this.getUserId() :  -  1;
 
             if (daysCount >  28 &&  daysCount <  32) {

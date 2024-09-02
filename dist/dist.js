@@ -431,7 +431,6 @@ var Calculator = /** @class */ (function () {
         var ipScore = options.ipScore;
         var service = options.service;
         var countries = options.countries;
-        console.debug(" [SPC]", "If you see, this is debug visible.");
         var myId = this.isLogged() ? this.getUserId() : -1;
         if (daysCount > 28 && daysCount < 32) {
             daysCount = 29;
