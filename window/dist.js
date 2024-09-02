@@ -287,8 +287,8 @@
 	 * @param {string} currency
 	 * @returns {CalculatorOutput}
 	 */
-        getRenewPrices(calculator,  currency =  null) {
-            return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 1, this.ipScore, this.service, this.countries));
+        getRenewPrices(calculator,  currency =  null,  type =  1) {
+            return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, type, this.ipScore, this.service, this.countries));
         }
         /**
 	 * @param {Calculator} calculator
@@ -548,6 +548,40 @@
             }
             else {
 
+                /* Traffic additional */
+
+                if (isRenew ==  4) {
+
+                    /*
+ * 25гб 0,5
+	100гб 1,25
+	400гб 5
+	800 10
+ */
+                     oneProxyPriceInUsd =  0;
+
+                    if (trafficInGb >=  800) {
+                         proxyAllPriceInUsd =  10;
+
+                    }
+                    else
+                    if (trafficInGb >=  400) {
+                         proxyAllPriceInUsd =  5;
+
+                    }
+                    else
+                    if (trafficInGb >=  100) {
+                         proxyAllPriceInUsd =  1.25;
+
+                    }
+                    else
+                    if (trafficInGb >=  25) {
+                         proxyAllPriceInUsd =  0.5;
+
+                    } salePercentage =  1;
+
+                }
+                else
                 if (version >=  30) {
                      let priceTraffic =  0;
                      oneProxyPriceInUsd =  0;
@@ -700,27 +734,27 @@
                     }
                     /* ----- Count discount ----- */
                      proxyAllPriceInUsd =  (proxyALlPriceInUsdPre) *  discount;
-                     proxyAllPriceInUsd =  proxyAllPriceInUsd +  priceTraffic;
+                     proxyAllPriceInUsd =  proxyAllPriceInUsd;
 
                     /* ----- Day pricing ----- */
 
                     if (daysCount >  33) {
-                         proxyAllPriceInUsd =  proxyAllPriceInUsd *  11;
+                         proxyAllPriceInUsd =  (proxyAllPriceInUsd *  11) +  (priceTraffic *  11);
 
                     }
                     else
                     if (daysCount >  22) {
-                         proxyAllPriceInUsd =  proxyAllPriceInUsd *  1;
+                         proxyAllPriceInUsd =  (proxyAllPriceInUsd *  1) +  priceTraffic;
 
                     }
                     else
                     if (daysCount >  11) {
-                         proxyAllPriceInUsd =  (proxyAllPriceInUsd /  2) *  1.2;
+                         proxyAllPriceInUsd =  ( (proxyAllPriceInUsd /  2) *  1.2) +  priceTraffic;
 
                     }
                     else
                     if (daysCount >  1) {
-                         proxyAllPriceInUsd =  (proxyAllPriceInUsd /  4) *  1.4;
+                         proxyAllPriceInUsd =  ( (proxyAllPriceInUsd /  4) *  1.4) +  priceTraffic;
 
                     }
                     /* ----- Day pricing ----- */

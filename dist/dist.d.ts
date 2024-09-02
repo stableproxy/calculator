@@ -201,7 +201,7 @@ export class PackageOrder {
      * @param {string} currency
      * @returns {CalculatorOutput}
      */
-    getRenewPrices(calculator: Calculator, currency?: string): CalculatorOutput;
+    getRenewPrices(calculator: Calculator, currency?: string, type?: number): CalculatorOutput;
     /**
      * @param {Calculator} calculator
      * @param {string} currency
