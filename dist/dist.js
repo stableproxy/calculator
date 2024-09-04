@@ -522,7 +522,10 @@ var Calculator = /** @class */ (function () {
     800 10
  */
                 oneProxyPriceInUsd = 0;
-                if (trafficInGb >= 800) {
+                if (trafficInGb >= 4000) {
+                    proxyAllPriceInUsd = 50;
+                }
+                else if (trafficInGb >= 800) {
                     proxyAllPriceInUsd = 10;
                 }
                 else if (trafficInGb >= 400) {
@@ -582,6 +585,9 @@ var Calculator = /** @class */ (function () {
                 }
                 else if (trafficInGb > 350 && trafficInGb < 500) {
                     priceTraffic = 4;
+                }
+                else if (trafficInGb > 4000) {
+                    priceTraffic = 50;
                 }
                 else if (trafficInGb > 500) {
                     priceTraffic = 8;

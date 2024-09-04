@@ -559,6 +559,11 @@
  */
                      oneProxyPriceInUsd =  0;
 
+                    if (trafficInGb >=  4000) {
+                         proxyAllPriceInUsd =  50;
+
+                    }
+                    else
                     if (trafficInGb >=  800) {
                          proxyAllPriceInUsd =  10;
 
@@ -642,6 +647,11 @@
                     else
                     if (trafficInGb >  350 &&  trafficInGb <  500) {
                          priceTraffic =  4;
+
+                    }
+                    else
+                    if (trafficInGb >  4000) {
+                         priceTraffic =  50;
 
                     }
                     else
