@@ -1,9 +1,9 @@
 {
-    "name": "@stableproxy/calculator",
+    "name": "@stableproxy\/calculator",
     "version": "1.0.51",
     "description": "Calculator module for the frontend",
-    "main": "./dist/dist.js",
-    "types": "./dist/dist.d.ts",
+    "main": ".\/dist\/dist.js",
+    "types": ".\/dist\/dist.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc -p ."
@@ -16,7 +16,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/stableproxy/calculator.git"
+        "url": "https:\/\/github.com\/stableproxy\/calculator.git"
     },
     "author": "StableProxy",
     "license": "ISC",
