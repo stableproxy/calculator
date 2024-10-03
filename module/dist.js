@@ -445,7 +445,7 @@ class Calculator {
 
         }
         if (version ==  -  1) {
-             version =  31;
+             version =  32;
 
         }
         if (ownerId ==  -  1) {
@@ -469,7 +469,12 @@ class Calculator {
         if (proxyFor ==  "residential_static_gb") {
              let oneIpPrice =  2;
              let oneGbPrice =  3;
-             let ipsPrice =  isRenew >  1 ?  0 :  (proxyCount *  oneIpPrice);
+
+            if (version >  32) {
+                 oneIpPrice =  2;
+                 oneGbPrice =  1;
+
+            } let ipsPrice =  isRenew >  1 ?  0 :  (proxyCount *  oneIpPrice);
              let gbsPrice =  isRenew ==  1 ?  0 :  (oneGbPrice *  trafficInGb);
              oneProxyPriceInUsd =  oneGbPrice;
              proxyAllPriceInUsd =  ipsPrice +  gbsPrice;
