@@ -456,7 +456,7 @@ var Calculator = /** @class */ (function () {
         if (proxyFor == "residential_static_gb") {
             var oneIpPrice = 2;
             var oneGbPrice = 3;
-            if (version > 32) {
+            if (version >= 32) {
                 oneIpPrice = 2;
                 oneGbPrice = 1;
             }

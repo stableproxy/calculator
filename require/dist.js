@@ -470,7 +470,7 @@ class Calculator {
              let oneIpPrice =  2;
              let oneGbPrice =  3;
 
-            if (version >  32) {
+            if (version >=  32) {
                  oneIpPrice =  2;
                  oneGbPrice =  1;
 
