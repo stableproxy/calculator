@@ -182,6 +182,7 @@ exports.CurrencyRates = CurrencyRates;
  * @property {number=} isRenew
  * @property {number=} ipScore
  * @property {string | null | undefined} [service]
+ * @property {Record<string, number>=} bonuses
  */
 /**
  * @class
@@ -191,7 +192,7 @@ var PackageOrder = /** @class */ (function () {
      * @param {PackageOrderConstructor} [options={}]
      */
     function PackageOrder(_a) {
-        var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version, isRenew = _b.isRenew, ipScore = _b.ipScore, service = _b.service;
+        var _b = _a === void 0 ? {} : _a, id = _b.id, count = _b.count, traffic_amount = _b.traffic_amount, traffic_unit = _b.traffic_unit, period_amount = _b.period_amount, period_unit = _b.period_unit, countries = _b.countries, currency = _b.currency, added_price_per_day = _b.added_price_per_day, type = _b.type, has_unlimited_auth_ips = _b.has_unlimited_auth_ips, user_id = _b.user_id, already_spent_in_usd = _b.already_spent_in_usd, version = _b.version, isRenew = _b.isRenew, ipScore = _b.ipScore, service = _b.service, bonuses = _b.bonuses;
         /** @type {number | null} */
         this.id = id || null;
         /** @type {number} */
@@ -226,6 +227,8 @@ var PackageOrder = /** @class */ (function () {
         this.ipScore = ipScore || 0;
         /** @type {string | null} */
         this.service = service || null;
+        /** @type {Record<string, number>} */
+        this.bonuses = bonuses || {};
     }
     Object.defineProperty(PackageOrder.prototype, "traffic_in_gb", {
         /**
@@ -265,7 +268,7 @@ var PackageOrder = /** @class */ (function () {
     PackageOrder.prototype.getRenewPrices = function (calculator, currency, type) {
         if (currency === void 0) { currency = null; }
         if (type === void 0) { type = 1; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, type, this.ipScore, this.service, this.countries));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, type, this.ipScore, this.service, this.countries, this.bonuses));
     };
     /**
      * @param {Calculator} calculator
@@ -274,13 +277,13 @@ var PackageOrder = /** @class */ (function () {
      */
     PackageOrder.prototype.getPrices = function (calculator, currency) {
         if (currency === void 0) { currency = null; }
-        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service, this.countries));
+        return (calculator || new Calculator()).calculate(new CalculatorInput(currency || this.currency, this.count, this.period_days, (!this.countries || Object.keys(this.countries).length == 0) && !this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service, this.countries, this.bonuses));
     };
     return PackageOrder;
 }());
 exports.PackageOrder = PackageOrder;
 var CalculatorInput = /** @class */ (function () {
-    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore, service, countries) {
+    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore, service, countries, bonuses) {
         if (currencyOrOptions === void 0) { currencyOrOptions = "USD"; }
         if (proxyCount === void 0) { proxyCount = 100; }
         if (daysCount === void 0) { daysCount = 29; }
@@ -295,6 +298,7 @@ var CalculatorInput = /** @class */ (function () {
         if (ipScore === void 0) { ipScore = 0; }
         if (service === void 0) { service = null; }
         if (countries === void 0) { countries = {}; }
+        if (bonuses === void 0) { bonuses = {}; }
         var isObject = currencyOrOptions !== null && typeof currencyOrOptions === 'object' && currencyOrOptions.constructor === Object;
         this.currency = isObject ? (currencyOrOptions["currency"] || "USD") : currencyOrOptions;
         this.proxyCount = isObject ? (currencyOrOptions["proxyCount"] || 100) : proxyCount;
@@ -310,6 +314,7 @@ var CalculatorInput = /** @class */ (function () {
         this.ipScore = isObject ? (currencyOrOptions["ipScore"] || 0) : ipScore;
         this.service = isObject ? (currencyOrOptions["service"] || null) : service;
         this.countries = isObject ? (currencyOrOptions["countries"] || {}) : countries;
+        this.bonuses = isObject ? (currencyOrOptions["bonuses"] || {}) : bonuses;
     }
     return CalculatorInput;
 }());
@@ -328,6 +333,9 @@ exports.CalculatorInput = CalculatorInput;
  * @property {number} salePercentage
  * @property {number} saleAmountUSD
  * @property {number} saleAmount
+ * @property {Record<string, number>} fees
+ * @property {Record<string, number>} bonuses
+ * @property {number} calc_at
  */
 var CalculatorOutput = /** @class */ (function () {
     function CalculatorOutput(options) {
@@ -357,6 +365,12 @@ var CalculatorOutput = /** @class */ (function () {
         this.saleAmountUSD = options.saleAmountUSD || 0;
         /** @type {number} */
         this.saleAmount = options.saleAmount || 0;
+        /** @type {Record<string, number>} */
+        this.fees = options.fees || {};
+        /** @type {Record<string, number>} */
+        this.bonuses = options.bonuses || {};
+        /** @type {number} */
+        this.calc_at = options.calc_at || 0;
     }
     return CalculatorOutput;
 }());
@@ -431,7 +445,9 @@ var Calculator = /** @class */ (function () {
         var ipScore = options.ipScore;
         var service = options.service;
         var countries = options.countries;
+        var bonuses = options.bonuses;
         var myId = this.isLogged() ? this.getUserId() : -1;
+        var fees = {};
         if (daysCount > 28 && daysCount < 32) {
             daysCount = 29;
         }
@@ -462,6 +478,9 @@ var Calculator = /** @class */ (function () {
             }
             var ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
             var gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
+            fees['ip'] = ipsPrice;
+            fees['one_gb'] = oneGbPrice;
+            fees['traffic'] = gbsPrice;
             oneProxyPriceInUsd = oneGbPrice;
             proxyAllPriceInUsd = ipsPrice + gbsPrice;
         }
@@ -474,6 +493,8 @@ var Calculator = /** @class */ (function () {
             };
             oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
+            fees['one_gb'] = oneProxyPriceInUsd;
+            fees['traffic'] = proxyAllPriceInUsd;
         }
         else if (isMobile) {
             if (String.prototype.endsWith.call(proxyFor, "modem") || String.prototype.endsWith.call(proxyFor, "static")) {
@@ -490,6 +511,7 @@ var Calculator = /** @class */ (function () {
                 if (daysCount > 35) {
                     proxyAllPriceInUsd = proxyAllPriceInUsd * 11;
                 }
+                fees['ip'] = oneProxyPriceInUsd;
             }
             else if (String.prototype.endsWith.call(proxyFor, "static_gb")) {
                 oneGbPrice = 0.5;
@@ -506,10 +528,15 @@ var Calculator = /** @class */ (function () {
                 gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
                 oneProxyPriceInUsd = oneGbPrice;
                 proxyAllPriceInUsd = ipsPrice + gbsPrice;
+                fees['ip'] = ipsPrice;
+                fees['one_gb'] = oneGbPrice;
+                fees['traffic'] = gbsPrice;
             }
             else {
                 oneProxyPriceInUsd = 0.85;
                 proxyAllPriceInUsd = oneProxyPriceInUsd * proxyCount;
+                fees['one_gb'] = oneProxyPriceInUsd;
+                fees['traffic'] = proxyAllPriceInUsd;
             }
         }
         else if (isPayAsGo) {
@@ -541,6 +568,7 @@ var Calculator = /** @class */ (function () {
                 else if (trafficInGb >= 25) {
                     proxyAllPriceInUsd = 0.5;
                 }
+                fees['traffic'] = proxyAllPriceInUsd;
                 salePercentage = 1;
             }
             else if (version >= 30) {
@@ -556,12 +584,14 @@ var Calculator = /** @class */ (function () {
                     oneProxyPriceInUsd = 0.08;
                 }
                 var proxyALlPriceInUsdPre = proxyCount * oneProxyPriceInUsd;
+                fees['ip'] = oneProxyPriceInUsd;
                 if (version >= 31 && !isRandomProxy) {
                     var LproxyALlPriceInUsdPre = 0;
                     var typedPriceMultipliers = {
                         "shared": {
                             "UA": 2
-                        }
+                        },
+                        "private": []
                     };
                     var priceMultiplied = typedPriceMultipliers[proxyFor] || [];
                     // for on countries
@@ -573,6 +603,7 @@ var Calculator = /** @class */ (function () {
                     }
                     console.debug(" [SPC]", LproxyALlPriceInUsdPre, proxyALlPriceInUsdPre);
                     if (LproxyALlPriceInUsdPre > proxyALlPriceInUsdPre) {
+                        fees['countries_specify'] = LproxyALlPriceInUsdPre - proxyALlPriceInUsdPre;
                         proxyALlPriceInUsdPre = LproxyALlPriceInUsdPre;
                     }
                 }
@@ -603,6 +634,7 @@ var Calculator = /** @class */ (function () {
                 /* ----- Adds ----- */
                 if (!isRandomProxy) {
                     addService += 1;
+                    fees['countries'] = addService;
                 }
                 /* ----- Adds ----- */
                 /* ----- Count discount ----- */
@@ -648,30 +680,37 @@ var Calculator = /** @class */ (function () {
                 }
                 /* ----- Count discount ----- */
                 proxyAllPriceInUsd = (proxyALlPriceInUsdPre) * discount;
-                proxyAllPriceInUsd = proxyAllPriceInUsd;
+                fees['ips'] = proxyALlPriceInUsdPre;
                 /* ----- Day pricing ----- */
+                var daysPrices = 0;
                 if (daysCount > 33) {
-                    proxyAllPriceInUsd = (proxyAllPriceInUsd * 11) + (priceTraffic * 11);
+                    priceTraffic = priceTraffic * 11;
+                    daysPrices = (proxyAllPriceInUsd * 11);
                 }
                 else if (daysCount > 22) {
-                    proxyAllPriceInUsd = (proxyAllPriceInUsd * 1) + priceTraffic;
+                    daysPrices = (proxyAllPriceInUsd * 1);
                 }
                 else if (daysCount > 11) {
-                    proxyAllPriceInUsd = ((proxyAllPriceInUsd / 2) * 1.2) + priceTraffic;
+                    daysPrices = ((proxyAllPriceInUsd / 2) * 1.2);
                 }
                 else if (daysCount > 1) {
-                    proxyAllPriceInUsd = ((proxyAllPriceInUsd / 4) * 1.4) + priceTraffic;
+                    daysPrices = ((proxyAllPriceInUsd / 4) * 1.4);
                 }
                 /* ----- Day pricing ----- */
-                proxyAllPriceInUsd = proxyAllPriceInUsd + addService;
+                fees['traffic'] = priceTraffic;
+                fees['days'] = daysPrices - proxyAllPriceInUsd;
+                proxyAllPriceInUsd = daysPrices + addService + priceTraffic;
                 /* ----- Service ----- */
                 if (service && service != 'overall') {
                     proxyAllPriceInUsd += 1;
+                    fees['geo_service'] = 1;
                 }
                 /* ----- Service ----- */
                 /* ----- Ip Score ----- */
                 if (ipScore >= 70) {
-                    proxyAllPriceInUsd = proxyAllPriceInUsd * 1.25;
+                    var scorePrice = proxyAllPriceInUsd * 1.25;
+                    fees['ip_score'] = scorePrice - proxyAllPriceInUsd;
+                    proxyAllPriceInUsd = scorePrice;
                 }
                 /* ----- Ip Score ----- */
             }
@@ -750,18 +789,51 @@ var Calculator = /** @class */ (function () {
         var proxyAllPriceInUsdWithSale = proxyAllPriceInUsd / salePercentage;
         var saleAmountInUSD = proxyAllPriceInUsd - proxyAllPriceInUsdWithSale;
         proxyAllPriceInUsd = proxyAllPriceInUsd - saleAmountInUSD;
+        var overAllBonus = 0;
+        for (var _b = 0, _c = Object.keys(bonuses); _b < _c.length; _b++) {
+            var type = _c[_b];
+            var value = bonuses[type];
+            var withBonusPrice = 0;
+            if (type == 'multiple') {
+                withBonusPrice = proxyAllPriceInUsd * value;
+            }
+            else if (type == 'add') {
+                withBonusPrice = proxyAllPriceInUsd + value;
+            }
+            else if (type == 'percent') {
+                withBonusPrice = proxyAllPriceInUsd * value;
+            }
+            else if (type == 'percent_add') {
+                withBonusPrice = proxyAllPriceInUsd + (proxyAllPriceInUsd * value);
+            }
+            else {
+                console.debug(" [SPC]", "Unknown bonus type");
+                console.debug(" [SPC]", type);
+            }
+            var diffBonus = withBonusPrice - proxyAllPriceInUsd;
+            overAllBonus += diffBonus;
+        }
+        proxyAllPriceInUsd = proxyAllPriceInUsd - overAllBonus;
+        if (overAllBonus > 0) {
+            fees['bonus'] = -overAllBonus;
+        }
         if (addedUSDToPerDay > 0) {
             proxyAllPriceInUsd += addedUSDToPerDay * daysCount;
         }
         if (hasUnlimitedIps) {
+            var addUnlimPrice = 0;
             if (isPayAsGo) {
-                proxyAllPriceInUsd += 1;
+                addUnlimPrice += 1;
             }
             if (isMobile) {
-                proxyAllPriceInUsd += 1;
+                addUnlimPrice += 1;
             }
             else {
-                proxyAllPriceInUsd += 2;
+                addUnlimPrice += 2;
+            }
+            if (addUnlimPrice > 0) {
+                fees['unlim_ips'] = addUnlimPrice;
+                proxyAllPriceInUsd += addUnlimPrice;
             }
         }
         var usdRate = this.currencyRates.get('USD');
@@ -795,8 +867,11 @@ var Calculator = /** @class */ (function () {
             /* Added in 1.2 (from 1.0 to 2.0) */
             'saleAmountUSD': CalcUtils.round(Math.abs(saleAmountInUSD), 2),
             /* Added in 1.3 */
-            'saleAmount': CalcUtils.round(Math.abs(saleAmountInUSD) * this.currencyRates.get(currency), 2)
+            'saleAmount': CalcUtils.round(Math.abs(saleAmountInUSD) * this.currencyRates.get(currency), 2),
             /* Added in 1.3 */
+            'fees': fees,
+            'bonuses': bonuses,
+            'calc_at': Date.now() / 1000,
         });
     };
     return Calculator;

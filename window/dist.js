@@ -183,6 +183,7 @@
  * @property {number=} isRenew
  * @property {number=} ipScore
  * @property {string | null | undefined} [service]
+ * @property {Record<string, number>=} bonuses
  */
 
     /**
@@ -210,7 +211,8 @@
             version,
             isRenew,
             ipScore,
-            service
+            service,
+            bonuses
         } =  {}) {
 
             /** @type {number | null} */
@@ -263,6 +265,9 @@
 
             /** @type {string | null} */
              this.service =  service ||  null;
+
+            /** @type {Record<string, number>} */
+             this.bonuses =  bonuses ||  {};
         }
         /**
 	 * @returns {number}
@@ -288,7 +293,7 @@
 	 * @returns {CalculatorOutput}
 	 */
         getRenewPrices(calculator,  currency =  null,  type =  1) {
-            return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, type, this.ipScore, this.service, this.countries));
+            return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0), this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, type, this.ipScore, this.service, this.countries, this.bonuses));
         }
         /**
 	 * @param {Calculator} calculator
@@ -296,11 +301,12 @@
 	 * @returns {CalculatorOutput}
 	 */
         getPrices(calculator,  currency =  null) {
-            return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service, this.countries));
+            return (calculator ||  new Calculator()).calculate(new CalculatorInput(currency ||  this.currency, this.count, this.period_days, (!this.countries ||  Object.keys(this.countries).length ==  0) &&  ! this.pay_for_setup, this.added_price_per_day, this.type, this.has_unlimited_auth_ips, this.version, this.traffic_in_gb, this.user_id, 0, this.ipScore, this.service, this.countries, this.bonuses));
         }
     }
     class CalculatorInput {
-        constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1,  isRenew =  0,  ipScore =  0,  service =  null,  countries =  {}) {
+        constructor(currencyOrOptions =  "USD",  proxyCount =  100,  daysCount =  29,  isRandomProxy =  true,  addedUSDToPerDay =  0,  proxyFor =  "shared",  hasUnlimitedIps =  false,  version =  - 1,  trafficInGb =  25,  ownerId =  - 1,  isRenew =  0,  ipScore =  0,  service =  null,  countries =  {},
+         bonuses =  {}) {
             const isObject =  currencyOrOptions !==  null &&  typeof currencyOrOptions ===  'object' &&  currencyOrOptions.constructor ===  Object;
             this.currency =  isObject ?  (currencyOrOptions[`currency`] ||  "USD") :  currencyOrOptions;
             this.proxyCount =  isObject ?  (currencyOrOptions[`proxyCount`] ||  100) :  proxyCount;
@@ -316,6 +322,7 @@
             this.ipScore =  isObject ?  (currencyOrOptions[`ipScore`] ||  0) :  ipScore;
             this.service =  isObject ?  (currencyOrOptions[`service`] ||  null) :  service;
             this.countries =  isObject ?  (currencyOrOptions[`countries`] ||  {}) :  countries;
+            this.bonuses =  isObject ?  (currencyOrOptions[`bonuses`] ||  {}) :  bonuses;
         }
     }
     /*
@@ -332,6 +339,9 @@
  * @property {number} salePercentage
  * @property {number} saleAmountUSD
  * @property {number} saleAmount
+ * @property {Record<string, number>} fees
+ * @property {Record<string, number>} bonuses
+ * @property {number} calc_at
  */
     class CalculatorOutput {
         constructor(options) {
@@ -361,6 +371,12 @@
             this.saleAmountUSD =  options.saleAmountUSD ||  0;
             /** @type {number} */
             this.saleAmount =  options.saleAmount ||  0;
+            /** @type {Record<string, number>} */
+            this.fees =  options.fees ||  {};
+            /** @type {Record<string, number>} */
+            this.bonuses =  options.bonuses ||  {};
+            /** @type {number} */
+            this.calc_at =  options.calc_at ||  0;
         }
     }
     class Calculator {
@@ -439,7 +455,9 @@
             let ipScore =  options.ipScore;
             let service =  options.service;
             let countries =  options.countries;
+            let bonuses =  options.bonuses;
              let myId =  this.isLogged() ?  this.getUserId() :  -  1;
+             let fees =  {};
 
             if (daysCount >  28 &&  daysCount <  32) {
                  daysCount =  29;
@@ -477,6 +495,9 @@
 
                 } let ipsPrice =  isRenew >  1 ?  0 :  (proxyCount *  oneIpPrice);
                  let gbsPrice =  isRenew ==  1 ?  0 :  (oneGbPrice *  trafficInGb);
+                 fees['ip'] =  ipsPrice;
+                 fees['one_gb'] =  oneGbPrice;
+                 fees['traffic'] =  gbsPrice;
                  oneProxyPriceInUsd =  oneGbPrice;
                  proxyAllPriceInUsd =  ipsPrice +  gbsPrice;
 
@@ -491,6 +512,8 @@
                 };
                  oneProxyPriceInUsd =  gbPrices[trafficInGb] ||  100;
                  proxyAllPriceInUsd =  oneProxyPriceInUsd *  trafficInGb;
+                 fees['one_gb'] =  oneProxyPriceInUsd;
+                 fees['traffic'] =  proxyAllPriceInUsd;
 
             }
             else
@@ -515,7 +538,8 @@
                     if (daysCount >  35) {
                          proxyAllPriceInUsd =  proxyAllPriceInUsd *  11;
 
-                    }
+                    } fees['ip'] =  oneProxyPriceInUsd;
+
                 }
                 else
                 if (String.prototype.endsWith.call(proxyFor,  "static_gb")) {
@@ -536,11 +560,16 @@
                      gbsPrice =  isRenew ==  1 ?  0 :  (oneGbPrice *  trafficInGb);
                      oneProxyPriceInUsd =  oneGbPrice;
                      proxyAllPriceInUsd =  ipsPrice +  gbsPrice;
+                     fees['ip'] =  ipsPrice;
+                     fees['one_gb'] =  oneGbPrice;
+                     fees['traffic'] =  gbsPrice;
 
                 }
                 else {
                      oneProxyPriceInUsd =  0.85;
                      proxyAllPriceInUsd =  oneProxyPriceInUsd *  proxyCount;
+                     fees['one_gb'] =  oneProxyPriceInUsd;
+                     fees['traffic'] =  proxyAllPriceInUsd;
 
                 }
             }
@@ -587,7 +616,8 @@
                     if (trafficInGb >=  25) {
                          proxyAllPriceInUsd =  0.5;
 
-                    } salePercentage =  1;
+                    } fees['traffic'] =  proxyAllPriceInUsd;
+                     salePercentage =  1;
 
                 }
                 else
@@ -608,13 +638,15 @@
                          oneProxyPriceInUsd =  0.08;
 
                     } let proxyALlPriceInUsdPre =  proxyCount *  oneProxyPriceInUsd;
+                     fees['ip'] =  oneProxyPriceInUsd;
 
                     if (version >=  31 &&  !  isRandomProxy) {
                          let LproxyALlPriceInUsdPre =  0;
                          let typedPriceMultipliers =  {
                              "shared":  {
                                  "UA":  2
-                            }
+                            },
+                             "private":  []
                         };
                          let priceMultiplied =  typedPriceMultipliers[proxyFor] ||  [];
                          // for on countries
@@ -627,6 +659,7 @@
                         } console.debug(` [SPC]`,  LproxyALlPriceInUsdPre,  proxyALlPriceInUsdPre);
 
                         if (LproxyALlPriceInUsdPre >  proxyALlPriceInUsdPre) {
+                             fees['countries_specify'] =  LproxyALlPriceInUsdPre -  proxyALlPriceInUsdPre;
                              proxyALlPriceInUsdPre =  LproxyALlPriceInUsdPre;
 
                         }
@@ -675,6 +708,7 @@
 
                     if (!isRandomProxy) {
                          addService +=  1;
+                         fees['countries'] =  addService;
 
                     }
                     /* ----- Adds ----- */
@@ -748,36 +782,41 @@
                     }
                     /* ----- Count discount ----- */
                      proxyAllPriceInUsd =  (proxyALlPriceInUsdPre) *  discount;
-                     proxyAllPriceInUsd =  proxyAllPriceInUsd;
+                     fees['ips'] =  proxyALlPriceInUsdPre;
 
                     /* ----- Day pricing ----- */
+                     let daysPrices =  0;
 
                     if (daysCount >  33) {
-                         proxyAllPriceInUsd =  (proxyAllPriceInUsd *  11) +  (priceTraffic *  11);
+                         priceTraffic =  priceTraffic *  11;
+                         daysPrices =  (proxyAllPriceInUsd *  11);
 
                     }
                     else
                     if (daysCount >  22) {
-                         proxyAllPriceInUsd =  (proxyAllPriceInUsd *  1) +  priceTraffic;
+                         daysPrices =  (proxyAllPriceInUsd *  1);
 
                     }
                     else
                     if (daysCount >  11) {
-                         proxyAllPriceInUsd =  ( (proxyAllPriceInUsd /  2) *  1.2) +  priceTraffic;
+                         daysPrices =  ( (proxyAllPriceInUsd /  2) *  1.2);
 
                     }
                     else
                     if (daysCount >  1) {
-                         proxyAllPriceInUsd =  ( (proxyAllPriceInUsd /  4) *  1.4) +  priceTraffic;
+                         daysPrices =  ( (proxyAllPriceInUsd /  4) *  1.4);
 
                     }
                     /* ----- Day pricing ----- */
-                     proxyAllPriceInUsd =  proxyAllPriceInUsd +  addService;
+                     fees['traffic'] =  priceTraffic;
+                     fees['days'] =  daysPrices -  proxyAllPriceInUsd;
+                     proxyAllPriceInUsd =  daysPrices +  addService +  priceTraffic;
 
                     /* ----- Service ----- */
 
                     if (service &&  service !=  'overall') {
                          proxyAllPriceInUsd +=  1;
+                         fees['geo_service'] =  1;
 
                     }
                     /* ----- Service ----- */
@@ -785,7 +824,9 @@
                     /* ----- Ip Score ----- */
 
                     if (ipScore >=  70) {
-                         proxyAllPriceInUsd =  proxyAllPriceInUsd *  1.25;
+                         let scorePrice =  proxyAllPriceInUsd *  1.25;
+                         fees['ip_score'] =  scorePrice -  proxyAllPriceInUsd;
+                         proxyAllPriceInUsd =  scorePrice;
 
                     }
                     /* ----- Ip Score ----- */
@@ -889,23 +930,66 @@
             } let proxyAllPriceInUsdWithSale =  proxyAllPriceInUsd /  salePercentage;
              let saleAmountInUSD =  proxyAllPriceInUsd -  proxyAllPriceInUsdWithSale;
              proxyAllPriceInUsd =  proxyAllPriceInUsd -  saleAmountInUSD;
+             let overAllBonus =  0;
 
+            for (let type of Object.keys(bonuses)) {
+                 let value =  bonuses[type];
+                 let withBonusPrice =  0;
+
+                if (type ==  'multiple') {
+                     withBonusPrice =  proxyAllPriceInUsd *  value;
+
+                }
+                else
+                if (type ==  'add') {
+                     withBonusPrice =  proxyAllPriceInUsd +  value;
+
+                }
+                else
+                if (type ==  'percent') {
+                     withBonusPrice =  proxyAllPriceInUsd *  value;
+
+                }
+                else
+                if (type ==  'percent_add') {
+                     withBonusPrice =  proxyAllPriceInUsd +  (proxyAllPriceInUsd *  value);
+
+                }
+                else {
+                     console.debug(` [SPC]`,  "Unknown bonus type");
+                     console.debug(` [SPC]`,  type);
+
+                } let diffBonus =  withBonusPrice -  proxyAllPriceInUsd;
+                 overAllBonus +=  diffBonus;
+
+            } proxyAllPriceInUsd =  proxyAllPriceInUsd -  overAllBonus;
+
+            if (overAllBonus >  0) {
+                 fees['bonus'] =  -  overAllBonus;
+
+            }
             if (addedUSDToPerDay >  0) {
                  proxyAllPriceInUsd +=  addedUSDToPerDay *  daysCount;
 
             }
             if (hasUnlimitedIps) {
+                 let addUnlimPrice =  0;
 
                 if (isPayAsGo) {
-                     proxyAllPriceInUsd +=  1;
+                     addUnlimPrice +=  1;
 
                 }
                 if (isMobile) {
-                     proxyAllPriceInUsd +=  1;
+                     addUnlimPrice +=  1;
 
                 }
                 else {
-                     proxyAllPriceInUsd +=  2;
+                     addUnlimPrice +=  2;
+
+                }
+                if (addUnlimPrice >  0) {
+                     fees['unlim_ips'] =  addUnlimPrice;
+                     proxyAllPriceInUsd +=  addUnlimPrice;
 
                 }
             } let usdRate =  this.currencyRates.get('USD');
@@ -943,8 +1027,12 @@
                  'saleAmountUSD':  CalcUtils.round(Math.abs(saleAmountInUSD),  2),
 
                 /* Added in 1.3 */
-                 'saleAmount':  CalcUtils.round(Math.abs(saleAmountInUSD) *  this.currencyRates.get(currency),  2)
+                 'saleAmount':  CalcUtils.round(Math.abs(saleAmountInUSD) *  this.currencyRates.get(currency),  2),
+
                 /* Added in 1.3 */
+                 'fees':  fees,
+                 'bonuses':  bonuses,
+                 'calc_at':  Date.now() /  1000,
 
             });
         }

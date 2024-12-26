@@ -17,6 +17,7 @@ export type PackageOrderConstructor = {
     isRenew?: number | undefined;
     ipScore?: number | undefined;
     service?: string | null | undefined;
+    bonuses?: Record<string, number> | undefined;
 };
 declare class Calculator {
     /**
@@ -41,7 +42,7 @@ declare class Calculator {
     calculate(options: CalculatorInput): CalculatorOutput;
 }
 export class CalculatorInput {
-    constructor(currencyOrOptions?: string, proxyCount?: number, daysCount?: number, isRandomProxy?: boolean, addedUSDToPerDay?: number, proxyFor?: string, hasUnlimitedIps?: boolean, version?: number, trafficInGb?: number, ownerId?: number, isRenew?: number, ipScore?: number, service?: any, countries?: {});
+    constructor(currencyOrOptions?: string, proxyCount?: number, daysCount?: number, isRandomProxy?: boolean, addedUSDToPerDay?: number, proxyFor?: string, hasUnlimitedIps?: boolean, version?: number, trafficInGb?: number, ownerId?: number, isRenew?: number, ipScore?: number, service?: any, countries?: {}, bonuses?: {});
     currency: any;
     proxyCount: any;
     daysCount: any;
@@ -56,6 +57,7 @@ export class CalculatorInput {
     ipScore: any;
     service: any;
     countries: any;
+    bonuses: any;
 }
 export class CurrencyRates {
     constructor(rates?: {
@@ -103,6 +105,12 @@ export class CalculatorOutput {
     saleAmountUSD: number;
     /** @type {number} */
     saleAmount: number;
+    /** @type {Record<string, number>} */
+    fees: Record<string, number>;
+    /** @type {Record<string, number>} */
+    bonuses: Record<string, number>;
+    /** @type {number} */
+    calc_at: number;
 }
 export class CalcUtils {
     /**
@@ -141,6 +149,7 @@ export class CalcUtils {
  * @property {number=} isRenew
  * @property {number=} ipScore
  * @property {string | null | undefined} [service]
+ * @property {Record<string, number>=} bonuses
  */
 /**
  * @class
@@ -149,7 +158,7 @@ export class PackageOrder {
     /**
      * @param {PackageOrderConstructor} [options={}]
      */
-    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version, isRenew, ipScore, service }?: PackageOrderConstructor);
+    constructor({ id, count, traffic_amount, traffic_unit, period_amount, period_unit, countries, currency, added_price_per_day, type, has_unlimited_auth_ips, user_id, already_spent_in_usd, version, isRenew, ipScore, service, bonuses }?: PackageOrderConstructor);
     /** @type {number | null} */
     id: number | null;
     /** @type {number} */
@@ -184,6 +193,8 @@ export class PackageOrder {
     ipScore: number;
     /** @type {string | null} */
     service: string | null;
+    /** @type {Record<string, number>} */
+    bonuses: Record<string, number>;
     /**
      * @returns {number}
      */
