@@ -42,22 +42,22 @@ declare class Calculator {
     calculate(options: CalculatorInput): CalculatorOutput;
 }
 export class CalculatorInput {
-    constructor(Wd3f5edb97_b976_a6f7c?: string, ude483a2af_2afe_62036?: number, Se40443e3f_e3fa_c738c?: number, Ed1462699d_99d6_bfbf4?: boolean, k882124820_8203_98d56?: number, G00a595152_1525_d2cf4?: string, p20c205e33_e337_3e81e?: boolean, f586215647_6472_c38d1?: number, w341ee2a2c_a2c3_d95b7?: number, Fbb4ce3280_2803_e64ad?: number, r577b9ed7e_d7ed_adac9?: number, t5c9e6f994_9947_17340?: number, P780bb5cc7_cc77_e7ee9?: any, p8c6882226_2260_4c979?: any[], ra57bb1a97_a974_46cf2?: {});
-    Wd3f5edb97_b976_a6f7c: any;
-    ude483a2af_2afe_62036: any;
-    Se40443e3f_e3fa_c738c: any;
-    Ed1462699d_99d6_bfbf4: any;
-    k882124820_8203_98d56: any;
-    G00a595152_1525_d2cf4: any;
-    p20c205e33_e337_3e81e: any;
-    f586215647_6472_c38d1: any;
-    w341ee2a2c_a2c3_d95b7: any;
-    Fbb4ce3280_2803_e64ad: any;
-    r577b9ed7e_d7ed_adac9: any;
-    t5c9e6f994_9947_17340: any;
-    P780bb5cc7_cc77_e7ee9: any;
-    p8c6882226_2260_4c979: any;
-    ra57bb1a97_a974_46cf2: any;
+    constructor(currencyOrOptions?: string, proxyCount?: number, daysCount?: number, isRandomProxy?: boolean, addedUSDToPerDay?: number, proxyFor?: string, hasUnlimitedIps?: boolean, version?: number, trafficInGb?: number, ownerId?: number, isRenew?: number, ipScore?: number, service?: any, countries?: {}, bonuses?: {});
+    currency: any;
+    proxyCount: any;
+    daysCount: any;
+    isRandomProxy: any;
+    addedUSDToPerDay: any;
+    proxyFor: any;
+    hasUnlimitedIps: any;
+    version: any;
+    trafficInGb: any;
+    ownerId: any;
+    isRenew: any;
+    ipScore: any;
+    service: any;
+    countries: any;
+    bonuses: any;
 }
 export class CurrencyRates {
     constructor(rates?: {

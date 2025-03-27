@@ -9,3 +9,4 @@ echo "Done, calculator module updated!"
 cd ./public/js/calculator\
 
 npm run build
+npm link
