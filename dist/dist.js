@@ -493,6 +493,9 @@ var Calculator = /** @class */ (function () {
                 "50": 1.5
             };
             oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
+            if (String.prototype.includes.call(proxyFor, "city")) {
+                oneProxyPriceInUsd *= 1.68;
+            }
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
             fees['one_gb'] = oneProxyPriceInUsd;
             fees['traffic'] = proxyAllPriceInUsd;
