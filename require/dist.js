@@ -478,6 +478,7 @@ class Calculator {
          let isPayAsGo =  String.prototype.startsWith.call(proxyFor,  "payasgo");
          let isMobile =  String.prototype.startsWith.call(proxyFor,  "mobile");
          let isResidential =  String.prototype.startsWith.call(proxyFor,  "residential");
+         let isDatacenterGb =  String.prototype.endsWith.call(proxyFor,  "datacenter_gb");
 
         if (isResidential ||  isMobile) {
              salePercentage =  1;
@@ -485,6 +486,24 @@ class Calculator {
         } let oneProxyPriceInUsd =  ( (0.03 *  3) /  29) *  daysCount;
          let proxyAllPriceInUsd =  1;
 
+        if (isDatacenterGb) {
+             let gbPrices =  {
+                 "1":  0.8,
+                 "25":  0.75,
+                 "100":  0.7,
+                 "500":  0.6
+            };
+             oneProxyPriceInUsd =  gbPrices[trafficInGb] ||  100;
+
+            if (String.prototype.includes.call(proxyFor,  "city")) {
+                 oneProxyPriceInUsd *=  1.68;
+
+            } proxyAllPriceInUsd =  oneProxyPriceInUsd *  trafficInGb;
+             fees['one_gb'] =  oneProxyPriceInUsd;
+             fees['traffic'] =  proxyAllPriceInUsd;
+
+        }
+        else
         if (proxyFor ==  "residential_static_gb") {
              let oneIpPrice =  2;
              let oneGbPrice =  3;
@@ -504,11 +523,11 @@ class Calculator {
         }
         else
         if (isResidential) {
-             let gbPrices =  {
-                 "1":  1.65,
-                 "5":  1.6,
-                 "25":  1.55,
-                 "50":  1.5
+             gbPrices =  {
+                 "1":  1.25,
+                 "5":  1.25,
+                 "25":  1.2,
+                 "50":  1.2
             };
              oneProxyPriceInUsd =  gbPrices[trafficInGb] ||  100;
 
