@@ -466,6 +466,7 @@ var Calculator = /** @class */ (function () {
         var isMobile = String.prototype.startsWith.call(proxyFor, "mobile");
         var isResidential = String.prototype.startsWith.call(proxyFor, "residential");
         var isDatacenterGb = String.prototype.endsWith.call(proxyFor, "datacenter_gb");
+        var isMobileRotating = String.prototype.endsWith.call(proxyFor, "mobile_rotating_gb");
         if (isResidential || isMobile) {
             salePercentage = 1;
         }
@@ -479,6 +480,13 @@ var Calculator = /** @class */ (function () {
                 "500": 0.6
             };
             oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
+            proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
+            fees['one_gb'] = oneProxyPriceInUsd;
+            fees['traffic'] = proxyAllPriceInUsd;
+        }
+        else if (proxyFor == "b2b_our_gb") {
+            // pay per gb every gb 2
+            oneProxyPriceInUsd = 2;
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
             fees['one_gb'] = oneProxyPriceInUsd;
             fees['traffic'] = proxyAllPriceInUsd;
@@ -504,6 +512,18 @@ var Calculator = /** @class */ (function () {
                 "5": 1.25,
                 "25": 1.2,
                 "50": 1.2
+            };
+            oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
+            proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
+            fees['one_gb'] = oneProxyPriceInUsd;
+            fees['traffic'] = proxyAllPriceInUsd;
+        }
+        else if (isMobileRotating) {
+            gbPrices = {
+                "1": 1.5,
+                "5": 1.4,
+                "25": 1.3,
+                "50": 1.25
             };
             oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
