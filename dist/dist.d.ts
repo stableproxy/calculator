@@ -61,18 +61,18 @@ export class CalculatorInput {
 }
 export class CurrencyRates {
     constructor(rates?: {
+        USD: number;
         EUR: number;
         GBP: number;
-        UAH: number;
-        USD: number;
         PLN: number;
+        UAH: number;
     });
     rates: {
+        USD: number;
         EUR: number;
         GBP: number;
-        UAH: number;
-        USD: number;
         PLN: number;
+        UAH: number;
     };
     get(currency: any): any;
     format(value: any, currency: any): string;

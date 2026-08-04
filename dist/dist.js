@@ -127,11 +127,11 @@ exports.CalcUtils = CalcUtils;
 var CurrencyRates = /** @class */ (function () {
     function CurrencyRates(rates) {
         if (rates === void 0) { rates = {
-            EUR: 0.92,
-            GBP: 0.78,
-            UAH: 41.12,
             USD: 1,
-            PLN: 3.92
+            EUR: 0.87,
+            GBP: 0.75,
+            PLN: 3.7,
+            UAH: 45.59
         }; }
         this.rates = rates;
     }
@@ -300,21 +300,21 @@ var CalculatorInput = /** @class */ (function () {
         if (countries === void 0) { countries = {}; }
         if (bonuses === void 0) { bonuses = {}; }
         var isObject = currencyOrOptions !== null && typeof currencyOrOptions === 'object' && currencyOrOptions.constructor === Object;
-        this.currency = isObject ? (currencyOrOptions["currency"] || "USD") : currencyOrOptions;
-        this.proxyCount = isObject ? (currencyOrOptions["proxyCount"] || 100) : proxyCount;
-        this.daysCount = isObject ? (currencyOrOptions["daysCount"] || 29) : daysCount;
-        this.isRandomProxy = isObject ? (currencyOrOptions["isRandomProxy"] || true) : isRandomProxy;
-        this.addedUSDToPerDay = isObject ? (currencyOrOptions["addedUSDToPerDay"] || 0) : addedUSDToPerDay;
-        this.proxyFor = isObject ? (currencyOrOptions["proxyFor"] || "shared") : proxyFor;
-        this.hasUnlimitedIps = isObject ? (currencyOrOptions["hasUnlimitedIps"] || false) : hasUnlimitedIps;
-        this.version = isObject ? (currencyOrOptions["version"] || -1) : version;
-        this.trafficInGb = isObject ? (currencyOrOptions["trafficInGb"] || 25) : trafficInGb;
-        this.ownerId = isObject ? (currencyOrOptions["ownerId"] || -1) : ownerId;
-        this.isRenew = isObject ? (currencyOrOptions["isRenew"] || 0) : isRenew;
-        this.ipScore = isObject ? (currencyOrOptions["ipScore"] || 0) : ipScore;
-        this.service = isObject ? (currencyOrOptions["service"] || null) : service;
-        this.countries = isObject ? (currencyOrOptions["countries"] || {}) : countries;
-        this.bonuses = isObject ? (currencyOrOptions["bonuses"] || {}) : bonuses;
+        this.currency = isObject ? ((currencyOrOptions["currency"] === undefined || currencyOrOptions["currency"] === null) ? "USD" : currencyOrOptions["currency"]) : currencyOrOptions;
+        this.proxyCount = isObject ? ((currencyOrOptions["proxyCount"] === undefined || currencyOrOptions["proxyCount"] === null) ? 100 : currencyOrOptions["proxyCount"]) : proxyCount;
+        this.daysCount = isObject ? ((currencyOrOptions["daysCount"] === undefined || currencyOrOptions["daysCount"] === null) ? 29 : currencyOrOptions["daysCount"]) : daysCount;
+        this.isRandomProxy = isObject ? ((currencyOrOptions["isRandomProxy"] === undefined || currencyOrOptions["isRandomProxy"] === null) ? true : currencyOrOptions["isRandomProxy"]) : isRandomProxy;
+        this.addedUSDToPerDay = isObject ? ((currencyOrOptions["addedUSDToPerDay"] === undefined || currencyOrOptions["addedUSDToPerDay"] === null) ? 0 : currencyOrOptions["addedUSDToPerDay"]) : addedUSDToPerDay;
+        this.proxyFor = isObject ? ((currencyOrOptions["proxyFor"] === undefined || currencyOrOptions["proxyFor"] === null) ? "shared" : currencyOrOptions["proxyFor"]) : proxyFor;
+        this.hasUnlimitedIps = isObject ? ((currencyOrOptions["hasUnlimitedIps"] === undefined || currencyOrOptions["hasUnlimitedIps"] === null) ? false : currencyOrOptions["hasUnlimitedIps"]) : hasUnlimitedIps;
+        this.version = isObject ? ((currencyOrOptions["version"] === undefined || currencyOrOptions["version"] === null) ? -1 : currencyOrOptions["version"]) : version;
+        this.trafficInGb = isObject ? ((currencyOrOptions["trafficInGb"] === undefined || currencyOrOptions["trafficInGb"] === null) ? 25 : currencyOrOptions["trafficInGb"]) : trafficInGb;
+        this.ownerId = isObject ? ((currencyOrOptions["ownerId"] === undefined || currencyOrOptions["ownerId"] === null) ? -1 : currencyOrOptions["ownerId"]) : ownerId;
+        this.isRenew = isObject ? ((currencyOrOptions["isRenew"] === undefined || currencyOrOptions["isRenew"] === null) ? 0 : currencyOrOptions["isRenew"]) : isRenew;
+        this.ipScore = isObject ? ((currencyOrOptions["ipScore"] === undefined || currencyOrOptions["ipScore"] === null) ? 0 : currencyOrOptions["ipScore"]) : ipScore;
+        this.service = isObject ? ((currencyOrOptions["service"] === undefined || currencyOrOptions["service"] === null) ? null : currencyOrOptions["service"]) : service;
+        this.countries = isObject ? ((currencyOrOptions["countries"] === undefined || currencyOrOptions["countries"] === null) ? {} : currencyOrOptions["countries"]) : countries;
+        this.bonuses = isObject ? ((currencyOrOptions["bonuses"] === undefined || currencyOrOptions["bonuses"] === null) ? {} : currencyOrOptions["bonuses"]) : bonuses;
     }
     return CalculatorInput;
 }());
@@ -467,19 +467,54 @@ var Calculator = /** @class */ (function () {
         var isResidential = String.prototype.startsWith.call(proxyFor, "residential");
         var isDatacenterGb = String.prototype.endsWith.call(proxyFor, "datacenter_gb");
         var isMobileRotating = String.prototype.endsWith.call(proxyFor, "mobile_rotating_gb");
+        // Mirrors the isPayForUsage() check on the Package model — billed by
+        // consumption rather than by period, which is what makes a per-GB unit
+        // price meaningful at all.
+        // NB: never write a class-qualified static reference anywhere in this
+        // method, comments included. The JS transpiler below rewrites those tokens
+        // and blows up on ones that do not resolve.
+        var isPayForUsage = (isPayAsGo || isMobile || isResidential) && (String.prototype.endsWith.call(proxyFor, "_gb") || String.prototype.endsWith.call(proxyFor, "_requests"));
         if (isResidential || isMobile) {
             salePercentage = 1;
         }
         var oneProxyPriceInUsd = ((0.03 * 3) / 29) * daysCount;
         var proxyAllPriceInUsd = 1;
+        // Declared here, not inside the per-type branches below. The JS transpiler
+        // emits `let` only at a variable's FIRST occurrence, and calculate() becomes
+        // a class method -- class bodies are always strict mode -- so a variable
+        // first declared inside one branch of this else-if chain is undefined when a
+        // sibling branch runs, and assigning to it throws a ReferenceError.
+        var gbPrices = {};
+        var hasTierPrice = false;
+        // Same reason, for the IP+GB types (residential_static_gb, mobile
+        // static_gb / mobile_private_gb): they share these four names across two
+        // sibling branches. `let` lands on the first branch and is block-scoped to
+        // it, so the second one threw "oneGbPrice is not defined" in the browser.
+        var oneIpPrice = 0;
+        var oneGbPrice = 0;
+        var ipsPrice = 0;
+        var gbsPrice = 0;
         if (isDatacenterGb) {
-            var gbPrices = {
+            gbPrices = {
                 "1": 0.8,
                 "25": 0.75,
                 "100": 0.7,
                 "500": 0.6
             };
-            oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
+            // Tier table, ascending by GB: step DOWN to the nearest lower tier so a
+            // non-listed amount is priced sanely instead of hitting the fallback.
+            oneProxyPriceInUsd = 100;
+            hasTierPrice = false;
+            // Loop variable names must be unique per branch: the transpiler emits
+            // `let` once per name, and a `for (let x of ...)` binding is scoped to
+            // its own statement, so a shared name would be undefined in the others.
+            for (var _i = 0, _a = Object.keys(gbPrices); _i < _a.length; _i++) {
+                var tierGbDc = _a[_i];
+                if (!hasTierPrice || trafficInGb >= tierGbDc) {
+                    oneProxyPriceInUsd = gbPrices[tierGbDc];
+                    hasTierPrice = true;
+                }
+            }
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
             fees['one_gb'] = oneProxyPriceInUsd;
             fees['traffic'] = proxyAllPriceInUsd;
@@ -492,14 +527,14 @@ var Calculator = /** @class */ (function () {
             fees['traffic'] = proxyAllPriceInUsd;
         }
         else if (proxyFor == "residential_static_gb") {
-            var oneIpPrice = 2;
-            var oneGbPrice = 3;
+            oneIpPrice = 2;
+            oneGbPrice = 3;
             if (version >= 32) {
                 oneIpPrice = 2;
                 oneGbPrice = 1;
             }
-            var ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
-            var gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
+            ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
+            gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
             fees['ip'] = ipsPrice;
             fees['one_gb'] = oneGbPrice;
             fees['traffic'] = gbsPrice;
@@ -508,24 +543,53 @@ var Calculator = /** @class */ (function () {
         }
         else if (isResidential) {
             gbPrices = {
-                "1": 1.25,
-                "5": 1.25,
-                "25": 1.2,
-                "50": 1.2
+                "0": 1.2,
+                "50": 1.1,
+                "100": 1,
+                "200": 0.95,
+                "500": 0.9,
+                "1000": 0.85,
+                "2000": 0.8,
+                "3000": 0.75,
+                "5000": 0.7,
+                "10000": 0.6
             };
-            oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
+            // Tier table, ascending by GB: step DOWN to the nearest lower tier so a
+            // non-listed amount is priced sanely instead of hitting the fallback.
+            oneProxyPriceInUsd = 100;
+            hasTierPrice = false;
+            for (var _b = 0, _c = Object.keys(gbPrices); _b < _c.length; _b++) {
+                var tierGbRes = _c[_b];
+                if (!hasTierPrice || trafficInGb >= tierGbRes) {
+                    oneProxyPriceInUsd = gbPrices[tierGbRes];
+                    hasTierPrice = true;
+                }
+            }
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
             fees['one_gb'] = oneProxyPriceInUsd;
             fees['traffic'] = proxyAllPriceInUsd;
         }
         else if (isMobileRotating) {
             gbPrices = {
-                "1": 1.5,
-                "5": 1.4,
-                "25": 1.3,
-                "50": 1.25
+                "1": 1,
+                "25": 0.9,
+                "50": 0.85,
+                "100": 0.8,
+                "200": 0.75,
+                "500": 0.7,
+                "1000": 0.6
             };
-            oneProxyPriceInUsd = gbPrices[trafficInGb] || 100;
+            // Tier table, ascending by GB: step DOWN to the nearest lower tier so a
+            // non-listed amount is priced sanely instead of hitting the fallback.
+            oneProxyPriceInUsd = 100;
+            hasTierPrice = false;
+            for (var _d = 0, _e = Object.keys(gbPrices); _d < _e.length; _d++) {
+                var tierGbMob = _e[_d];
+                if (!hasTierPrice || trafficInGb >= tierGbMob) {
+                    oneProxyPriceInUsd = gbPrices[tierGbMob];
+                    hasTierPrice = true;
+                }
+            }
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
             fees['one_gb'] = oneProxyPriceInUsd;
             fees['traffic'] = proxyAllPriceInUsd;
@@ -547,7 +611,7 @@ var Calculator = /** @class */ (function () {
                 }
                 fees['ip'] = oneProxyPriceInUsd;
             }
-            else if (String.prototype.endsWith.call(proxyFor, "static_gb")) {
+            else if (String.prototype.endsWith.call(proxyFor, "static_gb") || proxyFor == "mobile_private_gb") {
                 oneGbPrice = 0.5;
                 oneIpPrice = 20;
                 if (daysCount <= 3) {
@@ -567,8 +631,12 @@ var Calculator = /** @class */ (function () {
                 fees['traffic'] = gbsPrice;
             }
             else {
+                // mobile_gb and mobile_shared_gb: a flat per-GB rate, billed on the
+                // traffic actually ordered. mobile_gb used to multiply by the IP
+                // count instead, which was invisible while its count and its traffic
+                // were both pinned to 1 but priced every custom amount the same.
                 oneProxyPriceInUsd = 0.85;
-                proxyAllPriceInUsd = oneProxyPriceInUsd * proxyCount;
+                proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
                 fees['one_gb'] = oneProxyPriceInUsd;
                 fees['traffic'] = proxyAllPriceInUsd;
             }
@@ -643,8 +711,8 @@ var Calculator = /** @class */ (function () {
                     };
                     var priceMultiplied = typedPriceMultipliers[proxyFor] || [];
                     // for on countries
-                    for (var _i = 0, _a = Object.keys(countries); _i < _a.length; _i++) {
-                        var country = _a[_i];
+                    for (var _f = 0, _g = Object.keys(countries); _f < _g.length; _f++) {
+                        var country = _g[_f];
                         var ipMultiple = priceMultiplied[country] || 1;
                         var count = countries[country] || 0;
                         LproxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
@@ -657,26 +725,34 @@ var Calculator = /** @class */ (function () {
                 }
                 /* ----- Count ----- */
                 /* ----- Traffic ----- */
-                if (trafficInGb > 50 && trafficInGb < 150) {
-                    priceTraffic = 1;
-                }
-                else if (trafficInGb > 150 && trafficInGb < 250) {
-                    priceTraffic = 2;
-                }
-                else if (trafficInGb > 250 && trafficInGb < 350) {
-                    priceTraffic = 3;
-                }
-                else if (trafficInGb > 350 && trafficInGb < 500) {
-                    priceTraffic = 4;
+                // A descending ladder with no gaps. The old chain bounded every
+                // band with strict `>` AND `<`, so the exact boundary amounts
+                // 150 / 250 / 350 / 500 matched no band and fell through with
+                // priceTraffic still 0 — 500 GB billed less than 51 GB. That was
+                // unreachable while the cart only offered 25/100/400/800/5000, but
+                // a free-form traffic amount hits it head-on. Every preset keeps
+                // exactly the price it had; only those four values change.
+                if (trafficInGb == 0) {
+                    // 0 is "unlimited traffic" here, not "no traffic".
+                    priceTraffic = 50;
                 }
                 else if (trafficInGb > 4000) {
                     priceTraffic = 50;
                 }
-                else if (trafficInGb > 500) {
+                else if (trafficInGb >= 500) {
                     priceTraffic = 8;
                 }
-                else if (trafficInGb == 0) {
-                    priceTraffic = 50;
+                else if (trafficInGb >= 350) {
+                    priceTraffic = 4;
+                }
+                else if (trafficInGb >= 250) {
+                    priceTraffic = 3;
+                }
+                else if (trafficInGb >= 150) {
+                    priceTraffic = 2;
+                }
+                else if (trafficInGb > 50) {
+                    priceTraffic = 1;
                 }
                 /* ----- Traffic ----- */
                 /* ----- Adds ----- */
@@ -836,13 +912,24 @@ var Calculator = /** @class */ (function () {
             if (version > 4 && !isRandomProxy) {
                 proxyAllPriceInUsd += 0.15;
             }
+        } // Forced unit price. On a pay-for-usage order the admin-set value is not an
+        // addition to the daily price — it REPLACES the tier-derived /GB rate, so
+        // the tier table is ignored entirely for this order. Applied here, before
+        // sale and bonuses, so the forced rate flows through the rest of the
+        // pipeline exactly like a normally-derived one.
+        if (isPayForUsage && addedUSDToPerDay > 0) {
+            var oldTrafficPrice = fees['traffic'] || 0;
+            var newTrafficPrice = addedUSDToPerDay * trafficInGb;
+            fees['one_gb'] = addedUSDToPerDay;
+            fees['traffic'] = newTrafficPrice;
+            proxyAllPriceInUsd = proxyAllPriceInUsd - oldTrafficPrice + newTrafficPrice;
         }
         var proxyAllPriceInUsdWithSale = proxyAllPriceInUsd / salePercentage;
         var saleAmountInUSD = proxyAllPriceInUsd - proxyAllPriceInUsdWithSale;
         proxyAllPriceInUsd = proxyAllPriceInUsd - saleAmountInUSD;
         var overAllBonus = 0;
-        for (var _b = 0, _c = Object.keys(bonuses); _b < _c.length; _b++) {
-            var type = _c[_b];
+        for (var _h = 0, _j = Object.keys(bonuses); _h < _j.length; _h++) {
+            var type = _j[_h];
             var value = bonuses[type];
             var withBonusPrice = 0;
             if (type == 'multiple') {
@@ -867,8 +954,10 @@ var Calculator = /** @class */ (function () {
         proxyAllPriceInUsd = proxyAllPriceInUsd - overAllBonus;
         if (overAllBonus > 0) {
             fees['bonus'] = -overAllBonus;
-        }
-        if (addedUSDToPerDay > 0) {
+        } // Non-usage orders keep the original meaning: an extra charge per day. For
+        // pay-for-usage orders the same field was already consumed above as the
+        // forced /GB rate, so it must not also be billed per day.
+        if (addedUSDToPerDay > 0 && !isPayForUsage) {
             proxyAllPriceInUsd += addedUSDToPerDay * daysCount;
         }
         if (hasUnlimitedIps) {
@@ -886,7 +975,11 @@ var Calculator = /** @class */ (function () {
                 fees['unlim_ips'] = addUnlimPrice;
                 proxyAllPriceInUsd += addUnlimPrice;
             }
-        }
+        } // Direct array access is required here: the JS transpiler rewrites
+        // `sp.currencyRate` to `sp.currencyRate` and knows no other
+        // form. Missing-key safety is guaranteed upstream instead — the Money
+        // helper's getCurrencyRates() always returns every configured currency,
+        // repairing a short or poisoned cache entry rather than passing it on.
         var usdRate = this.currencyRates.get('USD');
         var currencyRate = this.currencyRates.get(currency);
         var totalPriceUSD = CalcUtils.round((Math.abs(proxyAllPriceInUsd)) * usdRate, 2);
