@@ -22,4 +22,7 @@ coverage
 *.log
 upload.sh
 
+# release tooling, not part of the package
+.github
+
 node_modules
