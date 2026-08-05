@@ -467,29 +467,14 @@ var Calculator = /** @class */ (function () {
         var isResidential = String.prototype.startsWith.call(proxyFor, "residential");
         var isDatacenterGb = String.prototype.endsWith.call(proxyFor, "datacenter_gb");
         var isMobileRotating = String.prototype.endsWith.call(proxyFor, "mobile_rotating_gb");
-        // Mirrors the isPayForUsage() check on the Package model — billed by
-        // consumption rather than by period, which is what makes a per-GB unit
-        // price meaningful at all.
-        // NB: never write a class-qualified static reference anywhere in this
-        // method, comments included. The JS transpiler below rewrites those tokens
-        // and blows up on ones that do not resolve.
         var isPayForUsage = (isPayAsGo || isMobile || isResidential) && (String.prototype.endsWith.call(proxyFor, "_gb") || String.prototype.endsWith.call(proxyFor, "_requests"));
         if (isResidential || isMobile) {
             salePercentage = 1;
         }
         var oneProxyPriceInUsd = ((0.03 * 3) / 29) * daysCount;
         var proxyAllPriceInUsd = 1;
-        // Declared here, not inside the per-type branches below. The JS transpiler
-        // emits `let` only at a variable's FIRST occurrence, and calculate() becomes
-        // a class method -- class bodies are always strict mode -- so a variable
-        // first declared inside one branch of this else-if chain is undefined when a
-        // sibling branch runs, and assigning to it throws a ReferenceError.
         var gbPrices = {};
         var hasTierPrice = false;
-        // Same reason, for the IP+GB types (residential_static_gb, mobile
-        // static_gb / mobile_private_gb): they share these four names across two
-        // sibling branches. `let` lands on the first branch and is block-scoped to
-        // it, so the second one threw "oneGbPrice is not defined" in the browser.
         var oneIpPrice = 0;
         var oneGbPrice = 0;
         var ipsPrice = 0;
@@ -501,13 +486,8 @@ var Calculator = /** @class */ (function () {
                 "100": 0.7,
                 "500": 0.6
             };
-            // Tier table, ascending by GB: step DOWN to the nearest lower tier so a
-            // non-listed amount is priced sanely instead of hitting the fallback.
             oneProxyPriceInUsd = 100;
             hasTierPrice = false;
-            // Loop variable names must be unique per branch: the transpiler emits
-            // `let` once per name, and a `for (let x of ...)` binding is scoped to
-            // its own statement, so a shared name would be undefined in the others.
             for (var _i = 0, _a = Object.keys(gbPrices); _i < _a.length; _i++) {
                 var tierGbDc = _a[_i];
                 if (!hasTierPrice || trafficInGb >= tierGbDc) {
@@ -520,7 +500,6 @@ var Calculator = /** @class */ (function () {
             fees['traffic'] = proxyAllPriceInUsd;
         }
         else if (proxyFor == "b2b_our_gb") {
-            // pay per gb every gb 2
             oneProxyPriceInUsd = 2;
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
             fees['one_gb'] = oneProxyPriceInUsd;
@@ -554,8 +533,6 @@ var Calculator = /** @class */ (function () {
                 "5000": 0.7,
                 "10000": 0.6
             };
-            // Tier table, ascending by GB: step DOWN to the nearest lower tier so a
-            // non-listed amount is priced sanely instead of hitting the fallback.
             oneProxyPriceInUsd = 100;
             hasTierPrice = false;
             for (var _b = 0, _c = Object.keys(gbPrices); _b < _c.length; _b++) {
@@ -579,8 +556,6 @@ var Calculator = /** @class */ (function () {
                 "500": 0.7,
                 "1000": 0.6
             };
-            // Tier table, ascending by GB: step DOWN to the nearest lower tier so a
-            // non-listed amount is priced sanely instead of hitting the fallback.
             oneProxyPriceInUsd = 100;
             hasTierPrice = false;
             for (var _d = 0, _e = Object.keys(gbPrices); _d < _e.length; _d++) {
@@ -612,15 +587,21 @@ var Calculator = /** @class */ (function () {
                 fees['ip'] = oneProxyPriceInUsd;
             }
             else if (String.prototype.endsWith.call(proxyFor, "static_gb") || proxyFor == "mobile_private_gb") {
-                oneGbPrice = 0.5;
-                oneIpPrice = 20;
-                if (daysCount <= 3) {
-                    oneIpPrice = 3;
-                    oneGbPrice = 1;
+                if (daysCount >= 29) {
+                    oneIpPrice = 30;
+                    oneGbPrice = 0.3;
                 }
-                else if (daysCount >= 3 && daysCount <= 18) {
-                    oneIpPrice = 12;
-                    oneGbPrice = 0.75;
+                else if (daysCount >= 14) {
+                    oneIpPrice = 20;
+                    oneGbPrice = 0.5;
+                }
+                else if (daysCount >= 7) {
+                    oneIpPrice = 10;
+                    oneGbPrice = 0.5;
+                }
+                else {
+                    oneIpPrice = 2;
+                    oneGbPrice = 0.5;
                 }
                 ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
                 gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
@@ -631,10 +612,6 @@ var Calculator = /** @class */ (function () {
                 fees['traffic'] = gbsPrice;
             }
             else {
-                // mobile_gb and mobile_shared_gb: a flat per-GB rate, billed on the
-                // traffic actually ordered. mobile_gb used to multiply by the IP
-                // count instead, which was invisible while its count and its traffic
-                // were both pinned to 1 but priced every custom amount the same.
                 oneProxyPriceInUsd = 0.85;
                 proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
                 fees['one_gb'] = oneProxyPriceInUsd;
@@ -646,14 +623,7 @@ var Calculator = /** @class */ (function () {
             proxyAllPriceInUsd = 1;
         }
         else {
-            /* Traffic additional */
             if (isRenew == 4) {
-                /*
- * 25гб 0,5
-    100гб 1,25
-    400гб 5
-    800 10
- */
                 oneProxyPriceInUsd = 0;
                 if (trafficInGb >= 4000) {
                     proxyAllPriceInUsd = 50;
@@ -680,17 +650,14 @@ var Calculator = /** @class */ (function () {
                 var discount = 0;
                 var defaultProxy = false;
                 var addPercentageOne = 1;
-                /* ----- Count ----- */
                 if (proxyFor == "private") {
                     oneProxyPriceInUsd = 0.9;
                     defaultProxy = true;
-                    // add 35%
                     addPercentageOne = (24 / 5) * (10 - proxyCount);
                 }
                 else if (proxyFor == "shared") {
                     oneProxyPriceInUsd = 0.08;
                     defaultProxy = true;
-                    // add 40%
                     addPercentageOne = (60 / 10) * (10 - proxyCount);
                 }
                 var isSmallCount = defaultProxy && proxyCount < 10;
@@ -710,7 +677,6 @@ var Calculator = /** @class */ (function () {
                         "private": []
                     };
                     var priceMultiplied = typedPriceMultipliers[proxyFor] || [];
-                    // for on countries
                     for (var _f = 0, _g = Object.keys(countries); _f < _g.length; _f++) {
                         var country = _g[_f];
                         var ipMultiple = priceMultiplied[country] || 1;
@@ -723,17 +689,7 @@ var Calculator = /** @class */ (function () {
                         proxyALlPriceInUsdPre = LproxyALlPriceInUsdPre;
                     }
                 }
-                /* ----- Count ----- */
-                /* ----- Traffic ----- */
-                // A descending ladder with no gaps. The old chain bounded every
-                // band with strict `>` AND `<`, so the exact boundary amounts
-                // 150 / 250 / 350 / 500 matched no band and fell through with
-                // priceTraffic still 0 — 500 GB billed less than 51 GB. That was
-                // unreachable while the cart only offered 25/100/400/800/5000, but
-                // a free-form traffic amount hits it head-on. Every preset keeps
-                // exactly the price it had; only those four values change.
                 if (trafficInGb == 0) {
-                    // 0 is "unlimited traffic" here, not "no traffic".
                     priceTraffic = 50;
                 }
                 else if (trafficInGb > 4000) {
@@ -754,14 +710,10 @@ var Calculator = /** @class */ (function () {
                 else if (trafficInGb > 50) {
                     priceTraffic = 1;
                 }
-                /* ----- Traffic ----- */
-                /* ----- Adds ----- */
                 if (!isRandomProxy) {
                     addService += 1;
                     fees['countries'] = addService;
                 }
-                /* ----- Adds ----- */
-                /* ----- Count discount ----- */
                 if (proxyFor == 'shared') {
                     if (proxyCount < 50) {
                         discount = 1.2;
@@ -802,10 +754,8 @@ var Calculator = /** @class */ (function () {
                         discount = 0.9;
                     }
                 }
-                /* ----- Count discount ----- */
                 proxyAllPriceInUsd = (proxyALlPriceInUsdPre) * discount;
                 fees['ips'] = proxyALlPriceInUsdPre;
-                /* ----- Day pricing ----- */
                 var daysPrices = 0;
                 if (daysCount > 33) {
                     priceTraffic = priceTraffic * 11;
@@ -820,26 +770,20 @@ var Calculator = /** @class */ (function () {
                 else if (daysCount > 1) {
                     daysPrices = ((proxyAllPriceInUsd / 4) * 1.4);
                 }
-                /* ----- Day pricing ----- */
-                /* - Change ips ignore date - */
                 if (isRenew != 6) {
                     fees['traffic'] = priceTraffic;
                     fees['days'] = daysPrices - proxyAllPriceInUsd;
                     proxyAllPriceInUsd = daysPrices + addService + priceTraffic;
                 }
-                /* ----- Service ----- */
                 if (service && service != 'overall') {
                     proxyAllPriceInUsd += 1;
                     fees['geo_service'] = 1;
                 }
-                /* ----- Service ----- */
-                /* ----- Ip Score ----- */
                 if (ipScore >= 70) {
                     var scorePrice = proxyAllPriceInUsd * 1.25;
                     fees['ip_score'] = scorePrice - proxyAllPriceInUsd;
                     proxyAllPriceInUsd = scorePrice;
                 }
-                /* ----- Ip Score ----- */
             }
             else {
                 if (proxyFor == "private") {
@@ -912,11 +856,7 @@ var Calculator = /** @class */ (function () {
             if (version > 4 && !isRandomProxy) {
                 proxyAllPriceInUsd += 0.15;
             }
-        } // Forced unit price. On a pay-for-usage order the admin-set value is not an
-        // addition to the daily price — it REPLACES the tier-derived /GB rate, so
-        // the tier table is ignored entirely for this order. Applied here, before
-        // sale and bonuses, so the forced rate flows through the rest of the
-        // pipeline exactly like a normally-derived one.
+        }
         if (isPayForUsage && addedUSDToPerDay > 0) {
             var oldTrafficPrice = fees['traffic'] || 0;
             var newTrafficPrice = addedUSDToPerDay * trafficInGb;
@@ -954,9 +894,7 @@ var Calculator = /** @class */ (function () {
         proxyAllPriceInUsd = proxyAllPriceInUsd - overAllBonus;
         if (overAllBonus > 0) {
             fees['bonus'] = -overAllBonus;
-        } // Non-usage orders keep the original meaning: an extra charge per day. For
-        // pay-for-usage orders the same field was already consumed above as the
-        // forced /GB rate, so it must not also be billed per day.
+        }
         if (addedUSDToPerDay > 0 && !isPayForUsage) {
             proxyAllPriceInUsd += addedUSDToPerDay * daysCount;
         }
@@ -975,11 +913,7 @@ var Calculator = /** @class */ (function () {
                 fees['unlim_ips'] = addUnlimPrice;
                 proxyAllPriceInUsd += addUnlimPrice;
             }
-        } // Direct array access is required here: the JS transpiler rewrites
-        // `sp.currencyRate` to `sp.currencyRate` and knows no other
-        // form. Missing-key safety is guaranteed upstream instead — the Money
-        // helper's getCurrencyRates() always returns every configured currency,
-        // repairing a short or poisoned cache entry rather than passing it on.
+        }
         var usdRate = this.currencyRates.get('USD');
         var currencyRate = this.currencyRates.get(currency);
         var totalPriceUSD = CalcUtils.round((Math.abs(proxyAllPriceInUsd)) * usdRate, 2);
