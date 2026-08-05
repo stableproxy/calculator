@@ -83,14 +83,35 @@ jobs:
           console.debug = () => {}; console.log = () => {};
 
           // Cases chosen to cross every pricing branch, not just the happy path.
+          // `expect` is the published price: when one of these changes on purpose
+          // it has to be updated here in the same commit, which is the point —
+          // a silent price change is exactly what must not reach npm.
+          //
+          // daysCount is pinned per case. The modem types step their price by
+          // period, so leaving it to the bundle default hides half the ladder.
           const cases = [
             { proxyFor: 'shared',             trafficInGb: 0,    expect: 50.15 },
             { proxyFor: 'shared',             trafficInGb: 500,  expect: 8.15  },
             { proxyFor: 'residential_gb',     trafficInGb: 333,  expect: 316.35 },
             { proxyFor: 'mobile_rotating_gb', trafficInGb: 1000, expect: 600 },
-            { proxyFor: 'mobile_gb',          trafficInGb: 77,   expect: 65.45 },
-            { proxyFor: 'mobile_static_gb',   trafficInGb: 77,   expect: 58.5 },
             { proxyFor: 'datacenter_gb',      trafficInGb: 333,  expect: 233.1 },
+
+            // Shared modem: pure pay-as-you-go, the period must not move it.
+            { proxyFor: 'mobile_gb',          trafficInGb: 77,   expect: 65.45 },
+            { proxyFor: 'mobile_shared_gb',   trafficInGb: 77,   expect: 65.45 },
+            { proxyFor: 'mobile_gb',          trafficInGb: 10, daysCount: 1,  expect: 8.5 },
+            { proxyFor: 'mobile_shared_gb',   trafficInGb: 10, daysCount: 30, expect: 8.5 },
+
+            // Dedicated modem: period fee + traffic, 1/7/14/30 day bands.
+            // mobile_private_gb is the same product and must price identically.
+            { proxyFor: 'mobile_static_gb',   trafficInGb: 10, daysCount: 1,  expect: 7  },
+            { proxyFor: 'mobile_static_gb',   trafficInGb: 10, daysCount: 7,  expect: 15 },
+            { proxyFor: 'mobile_static_gb',   trafficInGb: 10, daysCount: 14, expect: 25 },
+            { proxyFor: 'mobile_static_gb',   trafficInGb: 10, daysCount: 30, expect: 33 },
+            { proxyFor: 'mobile_private_gb',  trafficInGb: 10, daysCount: 1,  expect: 7  },
+            { proxyFor: 'mobile_private_gb',  trafficInGb: 10, daysCount: 7,  expect: 15 },
+            { proxyFor: 'mobile_private_gb',  trafficInGb: 10, daysCount: 14, expect: 25 },
+            { proxyFor: 'mobile_private_gb',  trafficInGb: 10, daysCount: 30, expect: 33 },
           ];
 
           for (const entry of ['./require/dist.js', './dist/dist.js']) {
@@ -102,14 +123,13 @@ jobs:
             assert.ok(CalculatorInput, `${entry} exports no CalculatorInput`);
 
             const calc = new Calculator();
-            for (const c of cases) {
+            for (const { expect, ...c } of cases) {
               const out = calc.calculate(new CalculatorInput({
-                currency: 'USD', proxyCount: 1, daysCount: 29,
-                proxyFor: c.proxyFor, trafficInGb: c.trafficInGb,
+                currency: 'USD', proxyCount: 1, daysCount: 29, ...c,
               }));
               assert.strictEqual(
-                out.overallUSD, c.expect,
-                `${entry}: ${c.proxyFor} at ${c.trafficInGb} GB priced ${out.overallUSD}, expected ${c.expect}`,
+                out.overallUSD, expect,
+                `${entry}: ${JSON.stringify(c)} priced ${out.overallUSD}, expected ${expect}`,
               );
             }
           }
