@@ -93,14 +93,21 @@ jobs:
             { proxyFor: 'shared',             trafficInGb: 0,    expect: 50.15 },
             { proxyFor: 'shared',             trafficInGb: 500,  expect: 8.15  },
             { proxyFor: 'residential_gb',     trafficInGb: 333,  expect: 316.35 },
-            { proxyFor: 'mobile_rotating_gb', trafficInGb: 1000, expect: 600 },
             { proxyFor: 'datacenter_gb',      trafficInGb: 333,  expect: 233.1 },
 
-            // Shared modem: pure pay-as-you-go, the period must not move it.
+            // Rotating GB, on its own ladder — dearer than the shared modem, and
+            // with no 200 GB break, so 333 GB still pays the 100 GB rate.
+            { proxyFor: 'mobile_rotating_gb', trafficInGb: 333,  expect: 416.25 },
+            { proxyFor: 'mobile_rotating_gb', trafficInGb: 1000, expect: 1100 },
+
+            // Shared modem: pure pay-as-you-go on a volume ladder, the period
+            // must not move it.
             { proxyFor: 'mobile_gb',          trafficInGb: 77,   expect: 65.45 },
             { proxyFor: 'mobile_shared_gb',   trafficInGb: 77,   expect: 65.45 },
-            { proxyFor: 'mobile_gb',          trafficInGb: 10, daysCount: 1,  expect: 8.5 },
-            { proxyFor: 'mobile_shared_gb',   trafficInGb: 10, daysCount: 30, expect: 8.5 },
+            { proxyFor: 'mobile_gb',          trafficInGb: 333,  expect: 249.75 },
+            { proxyFor: 'mobile_gb',          trafficInGb: 1000, expect: 600 },
+            { proxyFor: 'mobile_gb',          trafficInGb: 10, daysCount: 1,  expect: 10 },
+            { proxyFor: 'mobile_shared_gb',   trafficInGb: 10, daysCount: 30, expect: 10 },
 
             // Dedicated modem: period fee + traffic, 1/7/14/30 day bands.
             // mobile_private_gb is the same product and must price identically.

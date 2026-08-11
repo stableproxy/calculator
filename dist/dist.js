@@ -548,13 +548,12 @@ var Calculator = /** @class */ (function () {
         }
         else if (isMobileRotating) {
             gbPrices = {
-                "1": 1,
-                "25": 0.9,
-                "50": 0.85,
-                "100": 0.8,
-                "200": 0.75,
-                "500": 0.7,
-                "1000": 0.6
+                "1": 1.5,
+                "25": 1.4,
+                "50": 1.35,
+                "100": 1.25,
+                "500": 1.2,
+                "1000": 1.1
             };
             oneProxyPriceInUsd = 100;
             hasTierPrice = false;
@@ -612,7 +611,24 @@ var Calculator = /** @class */ (function () {
                 fees['traffic'] = gbsPrice;
             }
             else {
-                oneProxyPriceInUsd = 0.85;
+                gbPrices = {
+                    "1": 1,
+                    "25": 0.9,
+                    "50": 0.85,
+                    "100": 0.8,
+                    "200": 0.75,
+                    "500": 0.7,
+                    "1000": 0.6
+                };
+                oneProxyPriceInUsd = 100;
+                hasTierPrice = false;
+                for (var _f = 0, _g = Object.keys(gbPrices); _f < _g.length; _f++) {
+                    var tierGbMobShared = _g[_f];
+                    if (!hasTierPrice || trafficInGb >= tierGbMobShared) {
+                        oneProxyPriceInUsd = gbPrices[tierGbMobShared];
+                        hasTierPrice = true;
+                    }
+                }
                 proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
                 fees['one_gb'] = oneProxyPriceInUsd;
                 fees['traffic'] = proxyAllPriceInUsd;
@@ -677,8 +693,8 @@ var Calculator = /** @class */ (function () {
                         "private": []
                     };
                     var priceMultiplied = typedPriceMultipliers[proxyFor] || [];
-                    for (var _f = 0, _g = Object.keys(countries); _f < _g.length; _f++) {
-                        var country = _g[_f];
+                    for (var _h = 0, _j = Object.keys(countries); _h < _j.length; _h++) {
+                        var country = _j[_h];
                         var ipMultiple = priceMultiplied[country] || 1;
                         var count = countries[country] || 0;
                         LproxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
@@ -868,8 +884,8 @@ var Calculator = /** @class */ (function () {
         var saleAmountInUSD = proxyAllPriceInUsd - proxyAllPriceInUsdWithSale;
         proxyAllPriceInUsd = proxyAllPriceInUsd - saleAmountInUSD;
         var overAllBonus = 0;
-        for (var _h = 0, _j = Object.keys(bonuses); _h < _j.length; _h++) {
-            var type = _j[_h];
+        for (var _k = 0, _l = Object.keys(bonuses); _k < _l.length; _k++) {
+            var type = _l[_k];
             var value = bonuses[type];
             var withBonusPrice = 0;
             if (type == 'multiple') {

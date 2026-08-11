@@ -589,13 +589,12 @@ class Calculator {
         else
         if (isMobileRotating) {
              gbPrices =  {
-                 "1":  1,
-                 "25":  0.9,
-                 "50":  0.85,
-                 "100":  0.8,
-                 "200":  0.75,
-                 "500":  0.7,
-                 "1000":  0.6
+                 "1":  1.5,
+                 "25":  1.4,
+                 "50":  1.35,
+                 "100":  1.25,
+                 "500":  1.2,
+                 "1000":  1.1
             };
              oneProxyPriceInUsd =  100;
              hasTierPrice =  false;
@@ -671,8 +670,26 @@ class Calculator {
 
             }
             else {
-                 oneProxyPriceInUsd =  0.85;
-                 proxyAllPriceInUsd =  oneProxyPriceInUsd *  trafficInGb;
+                 gbPrices =  {
+                     "1":  1,
+                     "25":  0.9,
+                     "50":  0.85,
+                     "100":  0.8,
+                     "200":  0.75,
+                     "500":  0.7,
+                     "1000":  0.6
+                };
+                 oneProxyPriceInUsd =  100;
+                 hasTierPrice =  false;
+
+                for (let tierGbMobShared of Object.keys(gbPrices)) {
+
+                    if (!hasTierPrice ||  trafficInGb >=  tierGbMobShared) {
+                         oneProxyPriceInUsd =  gbPrices[tierGbMobShared];
+                         hasTierPrice =  true;
+
+                    }
+                } proxyAllPriceInUsd =  oneProxyPriceInUsd *  trafficInGb;
                  fees['one_gb'] =  oneProxyPriceInUsd;
                  fees['traffic'] =  proxyAllPriceInUsd;
 
