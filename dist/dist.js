@@ -708,8 +708,8 @@ var Calculator = /** @class */ (function () {
                 if (trafficInGb == 0) {
                     priceTraffic = 50;
                 }
-                else if (trafficInGb > 4000) {
-                    priceTraffic = 50;
+                else if (trafficInGb > 800) {
+                    priceTraffic = CalcUtils.round(trafficInGb / 100, 2);
                 }
                 else if (trafficInGb >= 500) {
                     priceTraffic = 8;

@@ -792,8 +792,8 @@ class Calculator {
 
                 }
                 else
-                if (trafficInGb >  4000) {
-                     priceTraffic =  50;
+                if (trafficInGb >  800) {
+                     priceTraffic =  CalcUtils.round(trafficInGb /  100,  2);
 
                 }
                 else
