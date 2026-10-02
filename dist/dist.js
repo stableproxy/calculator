@@ -511,6 +511,20 @@ var Calculator = /** @class */ (function () {
             if (version >= 32) {
                 oneIpPrice = 2;
                 oneGbPrice = 1;
+                gbPrices = {
+                    "1": 1,
+                    "5": 0.8,
+                    "25": 0.7,
+                    "50": 0.5
+                };
+                hasTierPrice = false;
+                for (var _b = 0, _c = Object.keys(gbPrices); _b < _c.length; _b++) {
+                    var tierIpResStatic = _c[_b];
+                    if (!hasTierPrice || proxyCount >= tierIpResStatic) {
+                        oneGbPrice = gbPrices[tierIpResStatic];
+                        hasTierPrice = true;
+                    }
+                }
             }
             ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
             gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
@@ -535,8 +549,8 @@ var Calculator = /** @class */ (function () {
             };
             oneProxyPriceInUsd = 100;
             hasTierPrice = false;
-            for (var _b = 0, _c = Object.keys(gbPrices); _b < _c.length; _b++) {
-                var tierGbRes = _c[_b];
+            for (var _d = 0, _e = Object.keys(gbPrices); _d < _e.length; _d++) {
+                var tierGbRes = _e[_d];
                 if (!hasTierPrice || trafficInGb >= tierGbRes) {
                     oneProxyPriceInUsd = gbPrices[tierGbRes];
                     hasTierPrice = true;
@@ -557,8 +571,8 @@ var Calculator = /** @class */ (function () {
             };
             oneProxyPriceInUsd = 100;
             hasTierPrice = false;
-            for (var _d = 0, _e = Object.keys(gbPrices); _d < _e.length; _d++) {
-                var tierGbMob = _e[_d];
+            for (var _f = 0, _g = Object.keys(gbPrices); _f < _g.length; _f++) {
+                var tierGbMob = _g[_f];
                 if (!hasTierPrice || trafficInGb >= tierGbMob) {
                     oneProxyPriceInUsd = gbPrices[tierGbMob];
                     hasTierPrice = true;
@@ -622,8 +636,8 @@ var Calculator = /** @class */ (function () {
                 };
                 oneProxyPriceInUsd = 100;
                 hasTierPrice = false;
-                for (var _f = 0, _g = Object.keys(gbPrices); _f < _g.length; _f++) {
-                    var tierGbMobShared = _g[_f];
+                for (var _h = 0, _j = Object.keys(gbPrices); _h < _j.length; _h++) {
+                    var tierGbMobShared = _j[_h];
                     if (!hasTierPrice || trafficInGb >= tierGbMobShared) {
                         oneProxyPriceInUsd = gbPrices[tierGbMobShared];
                         hasTierPrice = true;
@@ -693,8 +707,8 @@ var Calculator = /** @class */ (function () {
                         "private": []
                     };
                     var priceMultiplied = typedPriceMultipliers[proxyFor] || [];
-                    for (var _h = 0, _j = Object.keys(countries); _h < _j.length; _h++) {
-                        var country = _j[_h];
+                    for (var _k = 0, _l = Object.keys(countries); _k < _l.length; _k++) {
+                        var country = _l[_k];
                         var ipMultiple = priceMultiplied[country] || 1;
                         var count = countries[country] || 0;
                         LproxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
@@ -884,8 +898,8 @@ var Calculator = /** @class */ (function () {
         var saleAmountInUSD = proxyAllPriceInUsd - proxyAllPriceInUsdWithSale;
         proxyAllPriceInUsd = proxyAllPriceInUsd - saleAmountInUSD;
         var overAllBonus = 0;
-        for (var _k = 0, _l = Object.keys(bonuses); _k < _l.length; _k++) {
-            var type = _l[_k];
+        for (var _m = 0, _o = Object.keys(bonuses); _m < _o.length; _m++) {
+            var type = _o[_m];
             var value = bonuses[type];
             var withBonusPrice = 0;
             if (type == 'multiple') {
