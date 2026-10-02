@@ -547,7 +547,22 @@ class Calculator {
             if (version >=  32) {
                  oneIpPrice =  2;
                  oneGbPrice =  1;
+                 gbPrices =  {
+                     "1":  1,
+                     "5":  0.8,
+                     "25":  0.7,
+                     "50":  0.5
+                };
+                 hasTierPrice =  false;
 
+                for (let tierIpResStatic of Object.keys(gbPrices)) {
+
+                    if (!hasTierPrice ||  proxyCount >=  tierIpResStatic) {
+                         oneGbPrice =  gbPrices[tierIpResStatic];
+                         hasTierPrice =  true;
+
+                    }
+                }
             } ipsPrice =  isRenew >  1 ?  0 :  (proxyCount *  oneIpPrice);
              gbsPrice =  isRenew ==  1 ?  0 :  (oneGbPrice *  trafficInGb);
              fees['ip'] =  ipsPrice;
