@@ -68,6 +68,23 @@ var CalcUtils = /** @class */ (function () {
         }
         return !isNaN(value - 0);
     };
+    /**
+     * @param {*} value
+     * @returns {*}
+     */
+    CalcUtils.toNumbers = function (value) {
+        if (typeof value === 'string' && value.trim() !== '' && !isNaN(value)) {
+            return Number(value);
+        }
+        if (value !== null && typeof value === 'object') {
+            var out = Array.isArray(value) ? [] : {};
+            for (var key in value) {
+                out[key] = CalcUtils.toNumbers(value[key]);
+            }
+            return out;
+        }
+        return value;
+    };
     CalcUtils.round = function (num, dec) {
         if (dec === void 0) { dec = 0; }
         var num_sign = num >= 0 ? 1 : -1;
@@ -283,7 +300,7 @@ var PackageOrder = /** @class */ (function () {
 }());
 exports.PackageOrder = PackageOrder;
 var CalculatorInput = /** @class */ (function () {
-    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore, service, countries, bonuses) {
+    function CalculatorInput(currencyOrOptions, proxyCount, daysCount, isRandomProxy, addedUSDToPerDay, proxyFor, hasUnlimitedIps, version, trafficInGb, ownerId, isRenew, ipScore, service, countries, bonuses, pricing) {
         if (currencyOrOptions === void 0) { currencyOrOptions = "USD"; }
         if (proxyCount === void 0) { proxyCount = 100; }
         if (daysCount === void 0) { daysCount = 29; }
@@ -299,6 +316,7 @@ var CalculatorInput = /** @class */ (function () {
         if (service === void 0) { service = null; }
         if (countries === void 0) { countries = {}; }
         if (bonuses === void 0) { bonuses = {}; }
+        if (pricing === void 0) { pricing = null; }
         var isObject = currencyOrOptions !== null && typeof currencyOrOptions === 'object' && currencyOrOptions.constructor === Object;
         this.currency = isObject ? ((currencyOrOptions["currency"] === undefined || currencyOrOptions["currency"] === null) ? "USD" : currencyOrOptions["currency"]) : currencyOrOptions;
         this.proxyCount = isObject ? ((currencyOrOptions["proxyCount"] === undefined || currencyOrOptions["proxyCount"] === null) ? 100 : currencyOrOptions["proxyCount"]) : proxyCount;
@@ -315,6 +333,7 @@ var CalculatorInput = /** @class */ (function () {
         this.service = isObject ? ((currencyOrOptions["service"] === undefined || currencyOrOptions["service"] === null) ? null : currencyOrOptions["service"]) : service;
         this.countries = isObject ? ((currencyOrOptions["countries"] === undefined || currencyOrOptions["countries"] === null) ? {} : currencyOrOptions["countries"]) : countries;
         this.bonuses = isObject ? ((currencyOrOptions["bonuses"] === undefined || currencyOrOptions["bonuses"] === null) ? {} : currencyOrOptions["bonuses"]) : bonuses;
+        this.pricing = isObject ? ((currencyOrOptions["pricing"] === undefined || currencyOrOptions["pricing"] === null) ? null : currencyOrOptions["pricing"]) : pricing;
     }
     return CalculatorInput;
 }());
@@ -405,6 +424,195 @@ var Calculator = /** @class */ (function () {
         }; }
         this.currencyRates = new CurrencyRates();
         this.lang = new Lang();
+        this.pricing = {
+            "unlimited_ips_fee": {
+                "default": 2,
+                "mobile": 1,
+                "payasgo": 1,
+                "peer": 1
+            },
+            "referral_sale": 0.05,
+            "per_gb": {
+                "datacenter_gb": {
+                    "1": 0.8,
+                    "25": 0.75,
+                    "100": 0.7,
+                    "500": 0.6
+                },
+                "residential_gb": {
+                    "0": 1.2,
+                    "50": 1.1,
+                    "100": 1,
+                    "200": 0.95,
+                    "500": 0.9,
+                    "1000": 0.85,
+                    "2000": 0.8,
+                    "3000": 0.75,
+                    "5000": 0.7,
+                    "10000": 0.6
+                },
+                "mobile_rotating_gb": {
+                    "1": 1.5,
+                    "25": 1.4,
+                    "50": 1.35,
+                    "100": 1.25,
+                    "500": 1.2,
+                    "1000": 1.1
+                },
+                "mobile_shared_gb": {
+                    "1": 1,
+                    "25": 0.9,
+                    "50": 0.85,
+                    "100": 0.8,
+                    "200": 0.75,
+                    "500": 0.7,
+                    "1000": 0.6
+                }
+            },
+            "residential_static_gb": {
+                "per_ip": 2,
+                "per_gb_by_ips": {
+                    "1": 1,
+                    "5": 0.8,
+                    "25": 0.7,
+                    "50": 0.5
+                }
+            },
+            "mobile_private_gb": {
+                "by_min_days": {
+                    "0": {
+                        "per_modem": 2,
+                        "per_gb": 0.5
+                    },
+                    "7": {
+                        "per_modem": 10,
+                        "per_gb": 0.5
+                    },
+                    "14": {
+                        "per_modem": 20,
+                        "per_gb": 0.5
+                    },
+                    "29": {
+                        "per_modem": 30,
+                        "per_gb": 0.3
+                    }
+                }
+            },
+            "mobile_static": {
+                "by_max_days": {
+                    "3": 4.2,
+                    "18": 16.8
+                },
+                "beyond": 25.2,
+                "year": {
+                    "over_days": 35,
+                    "x": 11
+                }
+            },
+            "b2b_our_gb": {
+                "per_gb": 2
+            },
+            "payasgo": {
+                "flat": 1
+            },
+            "shared": {
+                "per_ip": 0.08,
+                "small_order": {
+                    "below": 10,
+                    "pct_per_missing_ip": 6
+                },
+                "count_multiplier": {
+                    "0": 1.2,
+                    "50": 1.1,
+                    "100": 1,
+                    "200": 0.97,
+                    "500": 0.95,
+                    "1000": 0.9,
+                    "10000": 0
+                }
+            },
+            "private": {
+                "per_ip": 0.9,
+                "small_order": {
+                    "below": 10,
+                    "pct_per_missing_ip": 4.8
+                },
+                "count_multiplier": {
+                    "0": 1,
+                    "50": 0.97,
+                    "100": 0.95,
+                    "200": 0.9,
+                    "500": 0.9,
+                    "1000": 0.9,
+                    "10000": 0
+                }
+            },
+            "country_multiplier": {
+                "shared": {
+                    "UA": 2
+                },
+                "private": []
+            },
+            "ip_packages": {
+                "traffic": {
+                    "unlimited": 50,
+                    "linear": {
+                        "over_gb": 800,
+                        "gb_per_usd": 100
+                    },
+                    "base": {
+                        "over_gb": 50,
+                        "usd": 1
+                    },
+                    "steps": {
+                        "150": 2,
+                        "250": 3,
+                        "350": 4,
+                        "500": 8
+                    }
+                },
+                "period": {
+                    "year": {
+                        "over_days": 33,
+                        "ips_x": 11,
+                        "traffic_x": 11
+                    },
+                    "month": {
+                        "over_days": 22,
+                        "ips_x": 1
+                    },
+                    "half": {
+                        "over_days": 11,
+                        "ips_div": 2,
+                        "ips_x": 1.2
+                    },
+                    "quarter": {
+                        "over_days": 1,
+                        "ips_div": 4,
+                        "ips_x": 1.4
+                    }
+                },
+                "fees": {
+                    "countries": 1,
+                    "geo_service": 1
+                },
+                "ip_score": {
+                    "min": 70,
+                    "x": 1.25
+                },
+                "traffic_once": {
+                    "below_first": 1,
+                    "steps": {
+                        "25": 0.5,
+                        "100": 1.25,
+                        "400": 5,
+                        "800": 10,
+                        "4000": 50
+                    }
+                }
+            }
+        };
+        this.userBonuses = {};
         this.userIdFetch = userIdFetch;
         this.salePercentageFetch = salePercentageFetch;
         this.localeFetch = localeFetch;
@@ -427,6 +635,35 @@ var Calculator = /** @class */ (function () {
         return this.getUserId() > 0;
     };
     /**
+     * @param {{pricing?: Object, fx?: {rates?: Object<string, (number|string)>}, user?: {sale_divisor?: (number|string), bonuses?: Object<string, (number|string)>}}} catalog
+     * @returns {Calculator}
+     */
+    Calculator.prototype.setCatalog = function (catalog) {
+        if (!catalog) {
+            return this;
+        }
+        if (catalog.pricing) {
+            this.pricing = CalcUtils.toNumbers(catalog.pricing);
+        }
+        if (catalog.fx && catalog.fx.rates) {
+            this.currencyRates = new CurrencyRates(CalcUtils.toNumbers(catalog.fx.rates));
+        }
+        if (catalog.user) {
+            var saleDivisor_1 = Number(catalog.user.sale_divisor) || 1;
+            this.salePercentageFetch = function () {
+                return saleDivisor_1;
+            };
+            this.userBonuses = CalcUtils.toNumbers(catalog.user.bonuses || {});
+        }
+        return this;
+    };
+    /**
+     * @returns {Object}
+     */
+    Calculator.prototype.getPricing = function () {
+        return this.pricing;
+    };
+    /**
      * @param {CalculatorInput} options
      * @returns {CalculatorOutput}
      */
@@ -446,6 +683,11 @@ var Calculator = /** @class */ (function () {
         var service = options.service;
         var countries = options.countries;
         var bonuses = options.bonuses;
+        var pricing = options.pricing;
+        if (!bonuses || Object.keys(bonuses).length === 0) {
+            bonuses = Object.assign({}, this.userBonuses);
+        }
+        pricing = pricing || this.pricing;
         var myId = this.isLogged() ? this.getUserId() : -1;
         var fees = {};
         console.debug(" [SPC]", "Renew type is ", isRenew);
@@ -471,8 +713,8 @@ var Calculator = /** @class */ (function () {
         if (isResidential || isMobile) {
             salePercentage = 1;
         }
-        var oneProxyPriceInUsd = ((0.03 * 3) / 29) * daysCount;
-        var proxyAllPriceInUsd = 1;
+        var oneProxyPriceInUsd = 0;
+        var proxyAllPriceInUsd = 0;
         var gbPrices = {};
         var hasTierPrice = false;
         var oneIpPrice = 0;
@@ -480,13 +722,7 @@ var Calculator = /** @class */ (function () {
         var ipsPrice = 0;
         var gbsPrice = 0;
         if (isDatacenterGb) {
-            gbPrices = {
-                "1": 0.8,
-                "25": 0.75,
-                "100": 0.7,
-                "500": 0.6
-            };
-            oneProxyPriceInUsd = 100;
+            gbPrices = pricing['per_gb']['datacenter_gb'];
             hasTierPrice = false;
             for (var _i = 0, _a = Object.keys(gbPrices); _i < _a.length; _i++) {
                 var tierGbDc = _a[_i];
@@ -500,30 +736,20 @@ var Calculator = /** @class */ (function () {
             fees['traffic'] = proxyAllPriceInUsd;
         }
         else if (proxyFor == "b2b_our_gb") {
-            oneProxyPriceInUsd = 2;
+            oneProxyPriceInUsd = pricing['b2b_our_gb']['per_gb'];
             proxyAllPriceInUsd = oneProxyPriceInUsd * trafficInGb;
             fees['one_gb'] = oneProxyPriceInUsd;
             fees['traffic'] = proxyAllPriceInUsd;
         }
         else if (proxyFor == "residential_static_gb") {
-            oneIpPrice = 2;
-            oneGbPrice = 3;
-            if (version >= 32) {
-                oneIpPrice = 2;
-                oneGbPrice = 1;
-                gbPrices = {
-                    "1": 1,
-                    "5": 0.8,
-                    "25": 0.7,
-                    "50": 0.5
-                };
-                hasTierPrice = false;
-                for (var _b = 0, _c = Object.keys(gbPrices); _b < _c.length; _b++) {
-                    var tierIpResStatic = _c[_b];
-                    if (!hasTierPrice || proxyCount >= tierIpResStatic) {
-                        oneGbPrice = gbPrices[tierIpResStatic];
-                        hasTierPrice = true;
-                    }
+            oneIpPrice = pricing['residential_static_gb']['per_ip'];
+            gbPrices = pricing['residential_static_gb']['per_gb_by_ips'];
+            hasTierPrice = false;
+            for (var _b = 0, _c = Object.keys(gbPrices); _b < _c.length; _b++) {
+                var tierIpResStatic = _c[_b];
+                if (!hasTierPrice || proxyCount >= tierIpResStatic) {
+                    oneGbPrice = gbPrices[tierIpResStatic];
+                    hasTierPrice = true;
                 }
             }
             ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
@@ -535,19 +761,7 @@ var Calculator = /** @class */ (function () {
             proxyAllPriceInUsd = ipsPrice + gbsPrice;
         }
         else if (isResidential) {
-            gbPrices = {
-                "0": 1.2,
-                "50": 1.1,
-                "100": 1,
-                "200": 0.95,
-                "500": 0.9,
-                "1000": 0.85,
-                "2000": 0.8,
-                "3000": 0.75,
-                "5000": 0.7,
-                "10000": 0.6
-            };
-            oneProxyPriceInUsd = 100;
+            gbPrices = pricing['per_gb']['residential_gb'];
             hasTierPrice = false;
             for (var _d = 0, _e = Object.keys(gbPrices); _d < _e.length; _d++) {
                 var tierGbRes = _e[_d];
@@ -561,15 +775,7 @@ var Calculator = /** @class */ (function () {
             fees['traffic'] = proxyAllPriceInUsd;
         }
         else if (isMobileRotating) {
-            gbPrices = {
-                "1": 1.5,
-                "25": 1.4,
-                "50": 1.35,
-                "100": 1.25,
-                "500": 1.2,
-                "1000": 1.1
-            };
-            oneProxyPriceInUsd = 100;
+            gbPrices = pricing['per_gb']['mobile_rotating_gb'];
             hasTierPrice = false;
             for (var _f = 0, _g = Object.keys(gbPrices); _f < _g.length; _f++) {
                 var tierGbMob = _g[_f];
@@ -584,37 +790,30 @@ var Calculator = /** @class */ (function () {
         }
         else if (isMobile) {
             if (String.prototype.endsWith.call(proxyFor, "modem") || String.prototype.endsWith.call(proxyFor, "static")) {
-                if (daysCount <= 3) {
-                    oneProxyPriceInUsd = 4.2;
-                }
-                else if (daysCount >= 3 && daysCount <= 18) {
-                    oneProxyPriceInUsd = 16.8;
-                }
-                else {
-                    oneProxyPriceInUsd = 25.2;
+                oneProxyPriceInUsd = pricing['mobile_static']['beyond'];
+                hasTierPrice = false;
+                for (var _h = 0, _j = Object.keys(pricing['mobile_static']['by_max_days']); _h < _j.length; _h++) {
+                    var tierDaysStatic = _j[_h];
+                    if (!hasTierPrice && daysCount <= tierDaysStatic) {
+                        oneProxyPriceInUsd = pricing['mobile_static']['by_max_days'][tierDaysStatic];
+                        hasTierPrice = true;
+                    }
                 }
                 proxyAllPriceInUsd = oneProxyPriceInUsd * proxyCount;
-                if (daysCount > 35) {
-                    proxyAllPriceInUsd = proxyAllPriceInUsd * 11;
+                if (daysCount > pricing['mobile_static']['year']['over_days']) {
+                    proxyAllPriceInUsd = proxyAllPriceInUsd * pricing['mobile_static']['year']['x'];
                 }
                 fees['ip'] = oneProxyPriceInUsd;
             }
             else if (String.prototype.endsWith.call(proxyFor, "static_gb") || proxyFor == "mobile_private_gb") {
-                if (daysCount >= 29) {
-                    oneIpPrice = 30;
-                    oneGbPrice = 0.3;
-                }
-                else if (daysCount >= 14) {
-                    oneIpPrice = 20;
-                    oneGbPrice = 0.5;
-                }
-                else if (daysCount >= 7) {
-                    oneIpPrice = 10;
-                    oneGbPrice = 0.5;
-                }
-                else {
-                    oneIpPrice = 2;
-                    oneGbPrice = 0.5;
+                hasTierPrice = false;
+                for (var _k = 0, _l = Object.keys(pricing['mobile_private_gb']['by_min_days']); _k < _l.length; _k++) {
+                    var tierDaysModem = _l[_k];
+                    if (!hasTierPrice || daysCount >= tierDaysModem) {
+                        oneIpPrice = pricing['mobile_private_gb']['by_min_days'][tierDaysModem]['per_modem'];
+                        oneGbPrice = pricing['mobile_private_gb']['by_min_days'][tierDaysModem]['per_gb'];
+                        hasTierPrice = true;
+                    }
                 }
                 ipsPrice = isRenew > 1 ? 0 : (proxyCount * oneIpPrice);
                 gbsPrice = isRenew == 1 ? 0 : (oneGbPrice * trafficInGb);
@@ -625,19 +824,10 @@ var Calculator = /** @class */ (function () {
                 fees['traffic'] = gbsPrice;
             }
             else {
-                gbPrices = {
-                    "1": 1,
-                    "25": 0.9,
-                    "50": 0.85,
-                    "100": 0.8,
-                    "200": 0.75,
-                    "500": 0.7,
-                    "1000": 0.6
-                };
-                oneProxyPriceInUsd = 100;
+                gbPrices = pricing['per_gb']['mobile_shared_gb'];
                 hasTierPrice = false;
-                for (var _h = 0, _j = Object.keys(gbPrices); _h < _j.length; _h++) {
-                    var tierGbMobShared = _j[_h];
+                for (var _m = 0, _o = Object.keys(gbPrices); _m < _o.length; _m++) {
+                    var tierGbMobShared = _o[_m];
                     if (!hasTierPrice || trafficInGb >= tierGbMobShared) {
                         oneProxyPriceInUsd = gbPrices[tierGbMobShared];
                         hasTierPrice = true;
@@ -649,26 +839,18 @@ var Calculator = /** @class */ (function () {
             }
         }
         else if (isPayAsGo) {
-            oneProxyPriceInUsd = 1;
-            proxyAllPriceInUsd = 1;
+            oneProxyPriceInUsd = pricing['payasgo']['flat'];
+            proxyAllPriceInUsd = pricing['payasgo']['flat'];
         }
         else {
             if (isRenew == 4) {
                 oneProxyPriceInUsd = 0;
-                if (trafficInGb >= 4000) {
-                    proxyAllPriceInUsd = 50;
-                }
-                else if (trafficInGb >= 800) {
-                    proxyAllPriceInUsd = 10;
-                }
-                else if (trafficInGb >= 400) {
-                    proxyAllPriceInUsd = 5;
-                }
-                else if (trafficInGb >= 100) {
-                    proxyAllPriceInUsd = 1.25;
-                }
-                else if (trafficInGb >= 25) {
-                    proxyAllPriceInUsd = 0.5;
+                proxyAllPriceInUsd = pricing['ip_packages']['traffic_once']['below_first'];
+                for (var _p = 0, _q = Object.keys(pricing['ip_packages']['traffic_once']['steps']); _p < _q.length; _p++) {
+                    var tierTrafficOnce = _q[_p];
+                    if (trafficInGb >= tierTrafficOnce) {
+                        proxyAllPriceInUsd = pricing['ip_packages']['traffic_once']['steps'][tierTrafficOnce];
+                    }
                 }
                 fees['traffic'] = proxyAllPriceInUsd;
                 salePercentage = 1;
@@ -680,17 +862,12 @@ var Calculator = /** @class */ (function () {
                 var discount = 0;
                 var defaultProxy = false;
                 var addPercentageOne = 1;
-                if (proxyFor == "private") {
-                    oneProxyPriceInUsd = 0.9;
+                if (proxyFor == "private" || proxyFor == "shared") {
+                    oneProxyPriceInUsd = pricing[proxyFor]['per_ip'];
                     defaultProxy = true;
-                    addPercentageOne = (24 / 5) * (10 - proxyCount);
+                    addPercentageOne = pricing[proxyFor]['small_order']['pct_per_missing_ip'] * (pricing[proxyFor]['small_order']['below'] - proxyCount);
                 }
-                else if (proxyFor == "shared") {
-                    oneProxyPriceInUsd = 0.08;
-                    defaultProxy = true;
-                    addPercentageOne = (60 / 10) * (10 - proxyCount);
-                }
-                var isSmallCount = defaultProxy && proxyCount < 10;
+                var isSmallCount = defaultProxy && proxyCount < pricing[proxyFor]['small_order']['below'];
                 if (isSmallCount) {
                     console.debug(" [SPC]", "[PRE] Using cheap proxies, orig price: ", oneProxyPriceInUsd);
                     oneProxyPriceInUsd = oneProxyPriceInUsd * (1 + addPercentageOne / 100);
@@ -700,15 +877,10 @@ var Calculator = /** @class */ (function () {
                 fees['ip'] = oneProxyPriceInUsd;
                 if (version >= 31 && !isRandomProxy) {
                     var LproxyALlPriceInUsdPre = 0;
-                    var typedPriceMultipliers = {
-                        "shared": {
-                            "UA": 2
-                        },
-                        "private": []
-                    };
+                    var typedPriceMultipliers = pricing['country_multiplier'];
                     var priceMultiplied = typedPriceMultipliers[proxyFor] || [];
-                    for (var _k = 0, _l = Object.keys(countries); _k < _l.length; _k++) {
-                        var country = _l[_k];
+                    for (var _r = 0, _s = Object.keys(countries); _r < _s.length; _r++) {
+                        var country = _s[_r];
                         var ipMultiple = priceMultiplied[country] || 1;
                         var count = countries[country] || 0;
                         LproxyALlPriceInUsdPre += oneProxyPriceInUsd * ipMultiple * count;
@@ -720,85 +892,51 @@ var Calculator = /** @class */ (function () {
                     }
                 }
                 if (trafficInGb == 0) {
-                    priceTraffic = 50;
+                    priceTraffic = pricing['ip_packages']['traffic']['unlimited'];
                 }
-                else if (trafficInGb > 800) {
-                    priceTraffic = CalcUtils.round(trafficInGb / 100, 2);
+                else if (trafficInGb > pricing['ip_packages']['traffic']['linear']['over_gb']) {
+                    priceTraffic = CalcUtils.round(trafficInGb / pricing['ip_packages']['traffic']['linear']['gb_per_usd'], 2);
                 }
-                else if (trafficInGb >= 500) {
-                    priceTraffic = 8;
-                }
-                else if (trafficInGb >= 350) {
-                    priceTraffic = 4;
-                }
-                else if (trafficInGb >= 250) {
-                    priceTraffic = 3;
-                }
-                else if (trafficInGb >= 150) {
-                    priceTraffic = 2;
-                }
-                else if (trafficInGb > 50) {
-                    priceTraffic = 1;
+                else {
+                    if (trafficInGb > pricing['ip_packages']['traffic']['base']['over_gb']) {
+                        priceTraffic = pricing['ip_packages']['traffic']['base']['usd'];
+                    }
+                    for (var _t = 0, _u = Object.keys(pricing['ip_packages']['traffic']['steps']); _t < _u.length; _t++) {
+                        var tierTrafficIp = _u[_t];
+                        if (trafficInGb >= tierTrafficIp) {
+                            priceTraffic = pricing['ip_packages']['traffic']['steps'][tierTrafficIp];
+                        }
+                    }
                 }
                 if (!isRandomProxy) {
-                    addService += 1;
+                    addService += pricing['ip_packages']['fees']['countries'];
                     fees['countries'] = addService;
                 }
-                if (proxyFor == 'shared') {
-                    if (proxyCount < 50) {
-                        discount = 1.2;
-                    }
-                    else if (proxyCount < 100) {
-                        discount = 1.1;
-                    }
-                    else if (proxyCount < 200) {
-                        discount = 1;
-                    }
-                    else if (proxyCount < 500) {
-                        discount = 0.97;
-                    }
-                    else if (proxyCount < 1000) {
-                        discount = 0.95;
-                    }
-                    else if (proxyCount < 10000) {
-                        discount = 0.9;
-                    }
-                }
-                else if (proxyFor == 'private') {
-                    if (proxyCount < 50) {
-                        discount = 1;
-                    }
-                    else if (proxyCount < 100) {
-                        discount = 0.97;
-                    }
-                    else if (proxyCount < 200) {
-                        discount = 0.95;
-                    }
-                    else if (proxyCount < 500) {
-                        discount = 0.9;
-                    }
-                    else if (proxyCount < 1000) {
-                        discount = 0.9;
-                    }
-                    else if (proxyCount < 10000) {
-                        discount = 0.9;
+                if (proxyFor == 'shared' || proxyFor == 'private') {
+                    hasTierPrice = false;
+                    for (var _v = 0, _w = Object.keys(pricing[proxyFor]['count_multiplier']); _v < _w.length; _v++) {
+                        var tierCountIp = _w[_v];
+                        if (!hasTierPrice || proxyCount >= tierCountIp) {
+                            discount = pricing[proxyFor]['count_multiplier'][tierCountIp];
+                            hasTierPrice = true;
+                        }
                     }
                 }
                 proxyAllPriceInUsd = (proxyALlPriceInUsdPre) * discount;
                 fees['ips'] = proxyALlPriceInUsdPre;
                 var daysPrices = 0;
-                if (daysCount > 33) {
-                    priceTraffic = priceTraffic * 11;
-                    daysPrices = (proxyAllPriceInUsd * 11);
+                if (daysCount > pricing['ip_packages']['period']['year']['over_days']) {
+                    priceTraffic = priceTraffic * pricing['ip_packages']['period']['year']['traffic_x'];
+                    daysPrices = (proxyAllPriceInUsd * pricing['ip_packages']['period']['year']['ips_x']);
                 }
-                else if (daysCount > 22 || isSmallCount) {
-                    daysPrices = (proxyAllPriceInUsd * 1);
+                else if (daysCount > pricing['ip_packages']['period']['month']['over_days'] || isSmallCount) {
+                    daysPrices = (proxyAllPriceInUsd * pricing['ip_packages']['period']['month']['ips_x']);
                 }
-                else if (daysCount > 11) {
-                    daysPrices = ((proxyAllPriceInUsd / 2) * 1.2);
+                else if (daysCount > pricing['ip_packages']['period']['half']['over_days']) {
+                    daysPrices = ((proxyAllPriceInUsd / pricing['ip_packages']['period']['half']['ips_div']) * pricing['ip_packages']['period']['half']['ips_x']);
                 }
-                else if (daysCount > 1) {
-                    daysPrices = ((proxyAllPriceInUsd / 4) * 1.4);
+                else if (daysCount > pricing['ip_packages']['period']['quarter']['over_days']) {
+                    daysPrices = ((proxyAllPriceInUsd / pricing['ip_packages']['period']['quarter']['ips_div']) * pricing['ip_packages']['period']['quarter']['ips_x']);
                 }
                 if (isRenew != 6) {
                     fees['traffic'] = priceTraffic;
@@ -806,86 +944,16 @@ var Calculator = /** @class */ (function () {
                     proxyAllPriceInUsd = daysPrices + addService + priceTraffic;
                 }
                 if (service && service != 'overall') {
-                    proxyAllPriceInUsd += 1;
-                    fees['geo_service'] = 1;
+                    proxyAllPriceInUsd += pricing['ip_packages']['fees']['geo_service'];
+                    fees['geo_service'] = pricing['ip_packages']['fees']['geo_service'];
                 }
-                if (ipScore >= 70) {
-                    var scorePrice = proxyAllPriceInUsd * 1.25;
+                if (ipScore >= pricing['ip_packages']['ip_score']['min']) {
+                    var scorePrice = proxyAllPriceInUsd * pricing['ip_packages']['ip_score']['x'];
                     fees['ip_score'] = scorePrice - proxyAllPriceInUsd;
                     proxyAllPriceInUsd = scorePrice;
                 }
             }
-            else {
-                if (proxyFor == "private") {
-                    oneProxyPriceInUsd = (1 / 29) * daysCount;
-                }
-                if (version > 1 && proxyFor != "private" && proxyCount < 100) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd * (Math.max(1, (Math.max(1, 50 - proxyCount) / 20)));
-                }
-                if (daysCount < 20) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd + (((10 - daysCount) / 1000) / 40);
-                }
-                if (proxyCount <= 50 && daysCount <= 20) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd * (Math.max(1, (Math.max(1, 70 - proxyCount) / 25)));
-                }
-                if (proxyCount >= 200 && daysCount <= 20) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd / (Math.min((daysCount > 8 ? 1.1 : 1.3), Math.max(1, Math.max(1, proxyCount - 199) / 25)));
-                }
-                if (daysCount <= 10) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd * 1.5;
-                }
-                if (daysCount <= 16) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd / 1.35;
-                }
-                if (daysCount <= 10 && proxyCount > 70) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd * 1.4;
-                }
-                if (daysCount <= 16 && proxyCount > 70) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd * 2.3;
-                }
-                if (daysCount >= 10 && daysCount <= 20) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd * 1.2;
-                }
-                if (daysCount > 350) {
-                    oneProxyPriceInUsd = oneProxyPriceInUsd * 0.90;
-                }
-                proxyAllPriceInUsd = proxyCount * oneProxyPriceInUsd;
-                if (version > 1 && (trafficInGb > 90 || trafficInGb <= 0) && proxyCount < 100) {
-                    proxyAllPriceInUsd += 1 * Math.max(daysCount / 29, 1);
-                }
-                if (version > 1 && (trafficInGb > 190 || trafficInGb <= 0)) {
-                    proxyAllPriceInUsd += 1.2 * Math.max(daysCount / 29, 1);
-                }
-                if (version > 1 && (trafficInGb > 390 || trafficInGb <= 0)) {
-                    proxyAllPriceInUsd += 1.5 * Math.max(daysCount / 29, 1);
-                }
-                if (version > 1 && (trafficInGb > 700 || trafficInGb <= 0)) {
-                    proxyAllPriceInUsd += 4 * Math.max(daysCount / 29, 1);
-                }
-                if (version > 1 && trafficInGb <= 0) {
-                    proxyAllPriceInUsd += 30 * Math.max(daysCount / 29, 1);
-                }
-                if (version > 5 && trafficInGb <= 0) {
-                    proxyAllPriceInUsd += Math.max(10, ((proxyCount / 100) * 1.2)) * Math.max(daysCount / 29, 1);
-                }
-                if (version > 5 && trafficInGb >= 400) {
-                    proxyAllPriceInUsd += (Math.max(1, ((proxyCount / 100) * 1.2)) * Math.max(daysCount / 29, 1) / 1.1);
-                }
-                if (version > 5 && trafficInGb >= 800) {
-                    proxyAllPriceInUsd += (Math.max(1, ((proxyCount / 100) * 1.2)) * Math.max(daysCount / 29, 1) / 1.2);
-                }
-                if (version > 15 && trafficInGb <= 0) {
-                    proxyAllPriceInUsd += proxyAllPriceInUsd * 0.3;
-                }
-            }
-        }
-        if (!isResidential && !isMobile && version <= 20) {
-            if (!isRandomProxy) {
-                proxyAllPriceInUsd += 0.85;
-            }
-            if (version > 4 && !isRandomProxy) {
-                proxyAllPriceInUsd += 0.15;
-            }
+            else { }
         }
         if (isPayForUsage && addedUSDToPerDay > 0) {
             var oldTrafficPrice = fees['traffic'] || 0;
@@ -898,8 +966,8 @@ var Calculator = /** @class */ (function () {
         var saleAmountInUSD = proxyAllPriceInUsd - proxyAllPriceInUsdWithSale;
         proxyAllPriceInUsd = proxyAllPriceInUsd - saleAmountInUSD;
         var overAllBonus = 0;
-        for (var _m = 0, _o = Object.keys(bonuses); _m < _o.length; _m++) {
-            var type = _o[_m];
+        for (var _x = 0, _y = Object.keys(bonuses); _x < _y.length; _x++) {
+            var type = _y[_x];
             var value = bonuses[type];
             var withBonusPrice = 0;
             if (type == 'multiple') {
@@ -931,13 +999,13 @@ var Calculator = /** @class */ (function () {
         if (hasUnlimitedIps) {
             var addUnlimPrice = 0;
             if (isPayAsGo) {
-                addUnlimPrice += 1;
+                addUnlimPrice += pricing['unlimited_ips_fee']['payasgo'];
             }
             if (isMobile) {
-                addUnlimPrice += 1;
+                addUnlimPrice += pricing['unlimited_ips_fee']['mobile'];
             }
             else {
-                addUnlimPrice += 2;
+                addUnlimPrice += pricing['unlimited_ips_fee']['default'];
             }
             if (addUnlimPrice > 0) {
                 fees['unlim_ips'] = addUnlimPrice;

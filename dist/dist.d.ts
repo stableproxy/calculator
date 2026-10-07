@@ -27,6 +27,195 @@ declare class Calculator {
     constructor(userIdFetch?: () => number, salePercentageFetch?: () => number, localeFetch?: () => string);
     currencyRates: CurrencyRates;
     lang: Lang;
+    pricing: {
+        unlimited_ips_fee: {
+            default: number;
+            mobile: number;
+            payasgo: number;
+            peer: number;
+        };
+        referral_sale: number;
+        per_gb: {
+            datacenter_gb: {
+                "1": number;
+                "25": number;
+                "100": number;
+                "500": number;
+            };
+            residential_gb: {
+                "0": number;
+                "50": number;
+                "100": number;
+                "200": number;
+                "500": number;
+                "1000": number;
+                "2000": number;
+                "3000": number;
+                "5000": number;
+                "10000": number;
+            };
+            mobile_rotating_gb: {
+                "1": number;
+                "25": number;
+                "50": number;
+                "100": number;
+                "500": number;
+                "1000": number;
+            };
+            mobile_shared_gb: {
+                "1": number;
+                "25": number;
+                "50": number;
+                "100": number;
+                "200": number;
+                "500": number;
+                "1000": number;
+            };
+        };
+        residential_static_gb: {
+            per_ip: number;
+            per_gb_by_ips: {
+                "1": number;
+                "5": number;
+                "25": number;
+                "50": number;
+            };
+        };
+        mobile_private_gb: {
+            by_min_days: {
+                "0": {
+                    per_modem: number;
+                    per_gb: number;
+                };
+                "7": {
+                    per_modem: number;
+                    per_gb: number;
+                };
+                "14": {
+                    per_modem: number;
+                    per_gb: number;
+                };
+                "29": {
+                    per_modem: number;
+                    per_gb: number;
+                };
+            };
+        };
+        mobile_static: {
+            by_max_days: {
+                "3": number;
+                "18": number;
+            };
+            beyond: number;
+            year: {
+                over_days: number;
+                x: number;
+            };
+        };
+        b2b_our_gb: {
+            per_gb: number;
+        };
+        payasgo: {
+            flat: number;
+        };
+        shared: {
+            per_ip: number;
+            small_order: {
+                below: number;
+                pct_per_missing_ip: number;
+            };
+            count_multiplier: {
+                "0": number;
+                "50": number;
+                "100": number;
+                "200": number;
+                "500": number;
+                "1000": number;
+                "10000": number;
+            };
+        };
+        private: {
+            per_ip: number;
+            small_order: {
+                below: number;
+                pct_per_missing_ip: number;
+            };
+            count_multiplier: {
+                "0": number;
+                "50": number;
+                "100": number;
+                "200": number;
+                "500": number;
+                "1000": number;
+                "10000": number;
+            };
+        };
+        country_multiplier: {
+            shared: {
+                UA: number;
+            };
+            private: any[];
+        };
+        ip_packages: {
+            traffic: {
+                unlimited: number;
+                linear: {
+                    over_gb: number;
+                    gb_per_usd: number;
+                };
+                base: {
+                    over_gb: number;
+                    usd: number;
+                };
+                steps: {
+                    "150": number;
+                    "250": number;
+                    "350": number;
+                    "500": number;
+                };
+            };
+            period: {
+                year: {
+                    over_days: number;
+                    ips_x: number;
+                    traffic_x: number;
+                };
+                month: {
+                    over_days: number;
+                    ips_x: number;
+                };
+                half: {
+                    over_days: number;
+                    ips_div: number;
+                    ips_x: number;
+                };
+                quarter: {
+                    over_days: number;
+                    ips_div: number;
+                    ips_x: number;
+                };
+            };
+            fees: {
+                countries: number;
+                geo_service: number;
+            };
+            ip_score: {
+                min: number;
+                x: number;
+            };
+            traffic_once: {
+                below_first: number;
+                steps: {
+                    "25": number;
+                    "100": number;
+                    "400": number;
+                    "800": number;
+                    "4000": number;
+                };
+            };
+        };
+    };
+    userBonuses: {};
     userIdFetch: () => number;
     salePercentageFetch: () => number;
     localeFetch: () => string;
@@ -36,13 +225,35 @@ declare class Calculator {
     getUserId(): number;
     isLogged(): boolean;
     /**
+     * @param {{pricing?: Object, fx?: {rates?: Object<string, (number|string)>}, user?: {sale_divisor?: (number|string), bonuses?: Object<string, (number|string)>}}} catalog
+     * @returns {Calculator}
+     */
+    setCatalog(catalog: {
+        pricing?: any;
+        fx?: {
+            rates?: {
+                [x: string]: (number | string);
+            };
+        };
+        user?: {
+            sale_divisor?: (number | string);
+            bonuses?: {
+                [x: string]: (number | string);
+            };
+        };
+    }): Calculator;
+    /**
+     * @returns {Object}
+     */
+    getPricing(): any;
+    /**
      * @param {CalculatorInput} options
      * @returns {CalculatorOutput}
      */
     calculate(options: CalculatorInput): CalculatorOutput;
 }
 export class CalculatorInput {
-    constructor(currencyOrOptions?: string, proxyCount?: number, daysCount?: number, isRandomProxy?: boolean, addedUSDToPerDay?: number, proxyFor?: string, hasUnlimitedIps?: boolean, version?: number, trafficInGb?: number, ownerId?: number, isRenew?: number, ipScore?: number, service?: any, countries?: {}, bonuses?: {});
+    constructor(currencyOrOptions?: string, proxyCount?: number, daysCount?: number, isRandomProxy?: boolean, addedUSDToPerDay?: number, proxyFor?: string, hasUnlimitedIps?: boolean, version?: number, trafficInGb?: number, ownerId?: number, isRenew?: number, ipScore?: number, service?: any, countries?: {}, bonuses?: {}, pricing?: any);
     currency: any;
     proxyCount: any;
     daysCount: any;
@@ -58,6 +269,7 @@ export class CalculatorInput {
     service: any;
     countries: any;
     bonuses: any;
+    pricing: any;
 }
 export class CurrencyRates {
     constructor(rates?: {
@@ -125,6 +337,11 @@ export class CalcUtils {
      */
     static array_key_exists(key: string | number, array: Record<any, any>): boolean;
     static is_numeric(value: any): boolean;
+    /**
+     * @param {*} value
+     * @returns {*}
+     */
+    static toNumbers(value: any): any;
     static round(num: any, dec?: number): number;
     static convertStorageUnit(size: any, fromUnit: any, toUnit: any, linux?: boolean): any;
     static addMonthsDate(date: any, months: any): any;
